@@ -22,16 +22,16 @@ public class KafkaSource {
         Properties props = new Properties();
 
         //指定Ka fka的Broker地址
-        props . setProperty( "bootstrap. servers", "node- 1.51doit . cn: 9092, node- -2.51doit . cn: 9092 , no");
+        props.setProperty( "bootstrap.servers", "localhost:9092");
         //指定组ID
-        props. setProperty("group.id", args[2]);
+        props.setProperty("group.id", "bruce");
         //如果没有记录偏移量，第一次从最开始消费
-        props . setProperty("auto. offset. reset", "earliest") ;
+        props.setProperty("auto.offset.reset", "earliest") ;
         //kafka的消费者不自动提交偏移量
         //props。setProperty("enable. auto. commit", "false");
 
         //2.read
-        FlinkKafkaConsumer<String> kafkaSource = new FlinkKafkaConsumer<>("tk100", new SimpleStringSchema(), props);
+        FlinkKafkaConsumer<String> kafkaSource = new FlinkKafkaConsumer<>("flink000", new SimpleStringSchema(), props);
 
 
         DataStream<String> lines = env.addSource(kafkaSource);

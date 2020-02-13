@@ -9,6 +9,7 @@ import org.apache.flink.streaming.api.windowing.windows.GlobalWindow;
 
 /**
  * 不分组划分窗口，将整体当成一个组
+ * @author bruce
  */
 public class CountWindowAll {
     public static void main(String[] args) throws Exception {

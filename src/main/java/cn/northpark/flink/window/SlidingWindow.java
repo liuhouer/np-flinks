@@ -8,18 +8,15 @@ import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
+import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.api.windowing.windows.GlobalWindow;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 
-import java.util.concurrent.TimeUnit;
-
 /**
- * 滚动窗口--先分组，达到N秒 划分窗口,窗口内的所有key组都会被执行
+ * 滑动窗口
  * @author bruce
  */
-public class TumblingWindow {
+public class SlidingWindow {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
@@ -40,15 +37,15 @@ public class TumblingWindow {
         KeyedStream<Tuple2<String, Integer>, Tuple> keyed = map.keyBy(0);
 
         //按照分组后分窗口
-//        WindowedStream<Tuple2<String, Integer>, Tuple, TimeWindow> window = keyed.timeWindow(Time.of(5, TimeUnit.SECONDS));
-        WindowedStream<Tuple2<String, Integer>, Tuple, TimeWindow> window = keyed.window(TumblingProcessingTimeWindows.of(Time.seconds(5)));
+//        WindowedStream<Tuple2<String, Integer>, Tuple, TimeWindow> window = keyed.timeWindow(Time.seconds(5));
+        WindowedStream<Tuple2<String, Integer>, Tuple, TimeWindow> window = keyed.window(SlidingProcessingTimeWindows.of(Time.seconds(10),Time.seconds(5)));
 
 
         SingleOutputStreamOperator<Tuple2<String, Integer>> summed = window.sum(1);
 
         summed.print();
 
-        env.execute("TumblingWindow");
+        env.execute("SlidingWindow");
 
 
     }

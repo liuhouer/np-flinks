@@ -9,6 +9,7 @@ import org.apache.flink.streaming.api.windowing.windows.GlobalWindow;
 
 /**
  * 先分组，每个组达到一定数目才会被触发窗口
+ * @author bruce
  */
 public class CountWindow {
     public static void main(String[] args) throws Exception {

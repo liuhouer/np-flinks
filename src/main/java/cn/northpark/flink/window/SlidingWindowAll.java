@@ -6,14 +6,13 @@ import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.api.windowing.windows.GlobalWindow;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 
 /**
- * 滚动窗口，不分组划分窗口，将整体当成一个组,5秒一个窗口
+ * 滑动窗口
  * @author bruce
  */
-public class TumblingWindowAll {
+public class SlidingWindowAll {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
@@ -25,15 +24,16 @@ public class TumblingWindowAll {
                 return Integer.parseInt(value);
             }
         });
+
         //不分组，将整体当成一个组
-        AllWindowedStream<Integer, TimeWindow> windowAll = map.timeWindowAll(Time.seconds(5));
+        AllWindowedStream<Integer, TimeWindow> windowAll = map.timeWindowAll(Time.seconds(10),Time.seconds(5));
 
 
         SingleOutputStreamOperator<Integer> summed = windowAll.sum(0);
 
         summed.print();
 
-        env.execute("TumblingWindowAll");
+        env.execute("SlidingWindowAll");
 
 
     }

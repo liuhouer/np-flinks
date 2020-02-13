@@ -15,12 +15,10 @@ MacOS 上可以方便的使用 brew 进行安装。
 
 然后安装zookeeper和kafka。
 
-
 `brew install kafka
 brew install zookeeper`
 修改 **/usr/local/etc/kafka/server.properties**, 找到 **listeners=PLAINTEXT://:9092** 那一行，把注释取消掉。
 然后修改为:
-
 `############################# Socket Server Settings #############################
 # The address the socket server listens on. It will get the value returned from 
 # java.net.InetAddress.getCanonicalHostName() if not configured.
@@ -28,32 +26,25 @@ brew install zookeeper`
 #     listeners = listener_name://host_name:port
 #   EXAMPLE:
 #     listeners = PLAINTEXT://your.host.name:9092
-listeners=PLAINTEXT://localhost:9092
-`
+listeners=PLAINTEXT://localhost:9092`
 启动
 
 如果想以服务的方式启动，那么可以:
 
-`
-$ brew services start zookeeper
+`$ brew services start zookeeper
 $ brew services start kafka`
 
 如果只是临时启动，可以:
-`
-$ zkServer start
-$ kafka-server-start /usr/local/etc/kafka/server.properties
-`
+`$ zkServer start
+$ kafka-server-start /usr/local/etc/kafka/server.properties`
 创建Topic
-`
-$ kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic flink000
-`
+`$ kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic flink000`
 查看所有topic
 `
 kafka-topics --list --zookeeper localhost:2181
 `
 产生消息
-`
-$ kafka-console-producer --broker-list localhost:9092 --topic flink000
+`$ kafka-console-producer --broker-list localhost:9092 --topic flink000
 >HELLO Kafka
 `
 消费

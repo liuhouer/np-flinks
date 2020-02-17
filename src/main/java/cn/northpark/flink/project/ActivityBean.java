@@ -36,6 +36,11 @@ public class ActivityBean {
     public int eventType;
     public String province;
 
+    public ActivityBean() {
+    }
+
+    public int counts = 1;
+
     public ActivityBean(String uid, String aid, String activityName, String time, int eventType, String province) {
         this.uid = uid;
         this.aid = aid;
@@ -43,6 +48,25 @@ public class ActivityBean {
         this.time = time;
         this.eventType = eventType;
         this.province = province;
+    }
+
+    public String longitude;//经度
+
+    public String latitude; //纬度
+
+    public ActivityBean(String uid, String aid, String activityName, String time, int eventType, String province, String longitude, String latitude) {
+        this.uid = uid;
+        this.aid = aid;
+        this.activityName = activityName;
+        this.time = time;
+        this.eventType = eventType;
+        this.province = province;
+        this.longitude = longitude;
+        this.latitude = latitude;
+    }
+
+    public static ActivityBean of(String uid, String aid, String activityName, String time, int eventType, String province,String longitude,String latitude){
+        return new ActivityBean(uid,aid,activityName,time,eventType,province,longitude,latitude);
     }
 
     public static ActivityBean of(String uid, String aid, String activityName, String time, int eventType, String province){
@@ -58,6 +82,8 @@ public class ActivityBean {
                 ", time='" + time + '\'' +
                 ", eventType=" + eventType +
                 ", province='" + province + '\'' +
+                ", longitude=" + longitude +
+                ", latitude=" + latitude +
                 '}';
     }
 }

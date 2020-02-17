@@ -88,4 +88,3 @@ kafka-topics --list --zookeeper localhost:2181
 
 **_Zookeeper_**：kafka集群依赖zookeeper来保存集群的的元信息，来保证系统的可用性。
 
-

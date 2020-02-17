@@ -1,5 +1,6 @@
 package cn.northpark.flink.project;
 
+import cn.northpark.flink.project.function.MysqlToActivityBeanFunciton;
 import cn.northpark.flink.util.FlinkUtilsV1;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -32,14 +33,20 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
  *  *  * A3  周末活动 2019-10-15 11:44:23
  *  *  * A4  年度促销 2019-10-15 11:44:23
  *
+ *
+ *
+ *  希望的得到的数据:
+ * u001新人礼包,2019-09-0210:10:11, 1,北京市
+ * u002 ,新人礼包,2019-09-0210:11:11, 1 ,辽宁省
+ *
  */
-public class HandleActivityNameApplication {
+public class MysqlActivityNameApplication {
 
     public static void main(String[] args) throws Exception {
 
         DataStream<String>  lines = FlinkUtilsV1.createKafkaStream(args,new SimpleStringSchema());
 
-        SingleOutputStreamOperator<ActivityBean> beans = lines.map(new SourceToActivityBeanFunciton());
+        SingleOutputStreamOperator<ActivityBean> beans = lines.map(new MysqlToActivityBeanFunciton());
 
         beans.print();
 

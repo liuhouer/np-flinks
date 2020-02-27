@@ -61,29 +61,29 @@ public class FlinkTumblingWindowsOuterJoinDemo {
     public static class OuterJoin implements CoGroupFunction<Tuple3<String, String, Long>, Tuple3<String, String, Long>, Tuple5<String, String, String, Long, Long>> {
         @Override
         public void coGroup(Iterable<Tuple3<String, String, Long>> leftElements, Iterable<Tuple3<String, String, Long>> rightElements, Collector<Tuple5<String, String, String, Long, Long>> out) {
-            HashMap<String, Element> left = new HashMap<>();
-            HashMap<String, Element> right = new HashMap<>();
+            HashMap<String, CountBean> left = new HashMap<>();
+            HashMap<String, CountBean> right = new HashMap<>();
             HashSet<String> set = new HashSet<>();
 
             for (Tuple3<String, String, Long> leftElem : leftElements) {
                 set.add(leftElem.f0);
-                left.put(leftElem.f0, new Element(leftElem.f1, leftElem.f2));
+                left.put(leftElem.f0, new CountBean(leftElem.f1, leftElem.f2));
             }
 
             for (Tuple3<String, String, Long> rightElem : rightElements) {
                 set.add(rightElem.f0);
-                right.put(rightElem.f0, new Element(rightElem.f1, rightElem.f2));
+                right.put(rightElem.f0, new CountBean(rightElem.f1, rightElem.f2));
             }
 
             for (String key : set) {
-                Element leftElem = getHashMapByDefault(left, key, new Element("null", -1L));
-                Element rightElem = getHashMapByDefault(right, key, new Element("null", -1L));
+                CountBean leftElem = getHashMapByDefault(left, key, new CountBean("null", -1L));
+                CountBean rightElem = getHashMapByDefault(right, key, new CountBean("null", -1L));
 
                 out.collect(new Tuple5<>(key, leftElem.getName(), rightElem.getName(), leftElem.getNumber(), rightElem.getNumber()));
             }
         }
 
-        private Element getHashMapByDefault(HashMap<String, Element> map, String key, Element defaultValue) {
+        private CountBean getHashMapByDefault(HashMap<String, CountBean> map, String key, CountBean defaultValue) {
             return map.get(key) == null ? defaultValue : map.get(key);
         }
     }

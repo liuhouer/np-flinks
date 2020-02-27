@@ -1,6 +1,6 @@
 package cn.northpark.flink.join;
 
-public class Element {
+public class CountBean {
 
     /**
      * 设置为 public
@@ -11,10 +11,10 @@ public class Element {
      */
     public long number;
 
-    public Element() {
+    public CountBean() {
     }
 
-    public Element(String name, long number) {
+    public CountBean(String name, long number) {
         this.name = name;
         this.number = number;
     }

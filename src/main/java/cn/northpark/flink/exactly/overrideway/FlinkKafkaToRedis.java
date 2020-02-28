@@ -1,4 +1,4 @@
-package cn.northpark.flink.project4;
+package cn.northpark.flink.exactly.overrideway;
 
 import cn.northpark.flink.util.FlinkUtils;
 import org.apache.flink.api.common.functions.FlatMapFunction;

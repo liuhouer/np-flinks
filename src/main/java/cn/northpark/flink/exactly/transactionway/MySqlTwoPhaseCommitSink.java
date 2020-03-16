@@ -40,7 +40,8 @@ public class MySqlTwoPhaseCommitSink extends TwoPhaseCommitSinkFunction<ObjectNo
     @Override
     protected Connection beginTransaction() throws Exception {
         String url = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&autoReconnect=true";
-        Connection connection = DBConnectUtil.getConnection(url, "root", "123456");
+//        Connection connection = DBConnectUtil.getConnection(url, "root", "123456");
+        Connection connection = null;
         System.err.println("start beginTransaction......."+connection);
         return connection;
     }

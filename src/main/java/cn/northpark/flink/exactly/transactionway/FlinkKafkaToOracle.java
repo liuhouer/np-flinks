@@ -10,16 +10,14 @@ import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.util.Collector;
-import org.apache.flink.util.StringUtils;
 
 import java.io.InputStream;
-import java.util.UUID;
 
 /***
- * Flink从kafka读取数据写入mysql 并且实现exactly once
+ * Flink从kafka读取数据写入Oracle 并且实现exactly once
  * @author bruce
  */
-public class FlinkKafkaToMysql {
+public class FlinkKafkaToOracle {
 
     public static void main(String[] args) throws  Exception{
 
@@ -40,13 +38,7 @@ public class FlinkKafkaToMysql {
             public void flatMap(String value, Collector<String> out) throws Exception {
                 String[] words = value.split(" ");
                 for (String word : words) {
-                    if("Bruce".equalsIgnoreCase(word)){
-                        System.out.println(1/0);
-                    }
-                    if(!StringUtils.isNullOrWhitespaceOnly(word)){
-
-                        out.collect(word);
-                    }
+                    out.collect(word);
                 }
             }
         });
@@ -65,9 +57,9 @@ public class FlinkKafkaToMysql {
         sumed.map(new MapFunction<Tuple2<String, Integer>, Tuple3<String, String,String>>() {
             @Override
             public Tuple3<String, String, String> map(Tuple2<String, Integer> value) throws Exception {
-                return Tuple3.of(UUID.randomUUID().toString(),value.f0,value.f1.toString() );
+                return Tuple3.of("NP-wordcount-sink-mysql",value.f0,value.f1.toString() );
             }
-        }).addSink(new MySqlOracleTwoPhaseCommitSink());
+        }).addSink(new MySqlOracleTwoPhaseCommitSink("oracle"));
 
 
         FlinkUtils.getEnv().execute("FlinkKafkaToMysql");

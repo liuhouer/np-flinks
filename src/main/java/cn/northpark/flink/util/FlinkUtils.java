@@ -1,7 +1,7 @@
 package cn.northpark.flink.util;
 
+import com.twitter.chill.thrift.TBaseSerializer;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
-import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -9,6 +9,7 @@ import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 
+import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -25,8 +26,19 @@ public class FlinkUtils {
     public static <T> DataStream<T> createKafkaStream(ParameterTool parameters, Class<? extends DeserializationSchema> clazz) throws  Exception{
 
         env.getConfig().setGlobalJobParameters(parameters);
+
+        env.getConfig().addDefaultKryoSerializer(Connection.class, TBaseSerializer.class);
+
         //开启checkpoint，并且开启重启策略
         env.enableCheckpointing(parameters.getLong("checkpoint.interval",5000L), CheckpointingMode.EXACTLY_ONCE);
+
+        //确保检查点之间有1s的时间间隔【checkpoint最小间隔】
+        env.getCheckpointConfig().setMinPauseBetweenCheckpoints(1000);
+
+        //检查点必须在10s之内完成，或者被丢弃【checkpoint超时时间】
+        env.getCheckpointConfig().setCheckpointTimeout(10000);
+        //同一时间只允许进行一次检查点
+        env.getCheckpointConfig().setMaxConcurrentCheckpoints(1);
 
         //取消任务以后不删除checkpoint数据
         env.getCheckpointConfig().enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);

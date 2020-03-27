@@ -1,18 +1,14 @@
 package cn.northpark.flink.exactly.transactionway;
 
 import cn.northpark.flink.util.FlinkUtils;
-import com.twitter.chill.thrift.TBaseSerializer;
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.StringUtils;
-import org.apache.thrift.TBase;
 
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -49,7 +45,7 @@ public class FlinkKafkaToMysql {
 
         words.print();
 
-        words.addSink(new MySqlOracleTwoPhaseCommitSink());
+        words.addSink(new MySqlTwoPhaseCommitSink());
 
 
         FlinkUtils.getEnv().execute("FlinkKafkaToMysql");

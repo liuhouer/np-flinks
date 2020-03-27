@@ -13,7 +13,7 @@ import java.util.Vector;
  * 手动实现JDBC数据库连接池
  * @author bruce
  */
-public class DBUtil {
+public class ManualJdbcPoolUtil {
 
     /* 静态数据库配置实体对象，程序运行时加载进内存 */
     private static PoolConfig config = new PoolConfig();
@@ -26,7 +26,7 @@ public class DBUtil {
 
         try {
 
-            prop.load(DBUtil.class.getClassLoader().getResourceAsStream("config.properties"));
+            prop.load(ManualJdbcPoolUtil.class.getClassLoader().getResourceAsStream("config.properties"));
 
             //获取配置文件信息传入config连接池配置对象
 
@@ -74,9 +74,10 @@ public class DBUtil {
             conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
-        }finally {
-            connPool.releaseConnection(conn);
         }
+//        finally {
+//            connPool.releaseConnection(conn);
+//        }
     }
 
     public static void rollBack(Connection conn) {
@@ -84,12 +85,15 @@ public class DBUtil {
             conn.rollback();
         } catch (SQLException e) {
             e.printStackTrace();
-        }finally {
-            connPool.releaseConnection(conn);
         }
+//        finally {
+//            connPool.releaseConnection(conn);
+//        }
     }
 
     /**
+     * 连接池配置类
+     * <p>
      * 线程安全
      * <p>
      * 有空闲连接的数量
@@ -124,6 +128,9 @@ public class DBUtil {
     }
 
 
+    /**
+     * 数据库连接池对象（根据配置创建对应连接池）
+     */
     public static class ConnectionPool {
         private PoolConfig config;//连接池的配置对象
         private int count;//记录连接池的连接数
@@ -167,6 +174,12 @@ public class DBUtil {
         }
 
 
+        /**
+         *  从连接池获取连接
+         *  
+         * @return
+         * @throws SQLException
+         */
         public synchronized Connection getConnection() throws SQLException {
             Connection conn = null;
 
@@ -227,6 +240,15 @@ public class DBUtil {
                 }
 
             }
+
+
+            useConn.remove(conn);
+
+            count--;
+
+            threadLocal.remove();
+
+            notifyAll();//放回连接池后说明有连接可用，唤醒阻塞的线程获取连接
         }
 
         /**

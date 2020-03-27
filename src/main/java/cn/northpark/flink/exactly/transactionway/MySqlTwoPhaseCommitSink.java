@@ -1,29 +1,24 @@
 package cn.northpark.flink.exactly.transactionway;
 
-import cn.northpark.flink.util.DBUtil;
-import com.alibaba.druid.pool.DruidDataSource;
-import com.twitter.chill.thrift.TBaseSerializer;
-import com.zaxxer.hikari.HikariConfig;
+import cn.northpark.flink.util.ManualJdbcPoolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.common.typeutils.base.VoidSerializer;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.runtime.kryo.KryoSerializer;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.TwoPhaseCommitSinkFunction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 /**
- * mysql | oracle 通过两阶段提交，实现消费的exactly-once(不多不少，仅消费一次)
+ * mysql通过两阶段提交，实现消费的exactly-once(不多不少，仅消费一次)
  */
 @Slf4j
-public class MySqlOracleTwoPhaseCommitSink extends TwoPhaseCommitSinkFunction<Tuple3<String, String, String>, Connection, Void> {
+public class MySqlTwoPhaseCommitSink extends TwoPhaseCommitSinkFunction<Tuple3<String, String, String>, Connection, Void> {
 
 
-    public MySqlOracleTwoPhaseCommitSink() {
+    public MySqlTwoPhaseCommitSink() {
 
         super(new KryoSerializer<>(Connection.class, new ExecutionConfig()), VoidSerializer.INSTANCE);
 
@@ -59,7 +54,7 @@ public class MySqlOracleTwoPhaseCommitSink extends TwoPhaseCommitSinkFunction<Tu
 
 //        String url = "jdbc:mysql://localhost:3306/flink?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&autoReconnect=true";
 //        Connection connection = HikariUtils.getConnection(url, "root", "123456");
-        Connection connection = DBUtil.getConnection(false);
+        Connection connection = ManualJdbcPoolUtil.getConnection(false);
         log.info("start beginTransaction......." + connection);
         return connection;
     }
@@ -85,7 +80,7 @@ public class MySqlOracleTwoPhaseCommitSink extends TwoPhaseCommitSinkFunction<Tu
         log.info("start commit......." + connection);
 //        HikariUtils.commit(connection);
 
-        DBUtil.commit(connection);
+        ManualJdbcPoolUtil.commit(connection);
     }
 
     /**
@@ -98,7 +93,7 @@ public class MySqlOracleTwoPhaseCommitSink extends TwoPhaseCommitSinkFunction<Tu
         log.info("start abort rollback......." + connection);
 //        HikariUtils.rollback(connection);
 
-        DBUtil.rollBack(connection);
+        ManualJdbcPoolUtil.rollBack(connection);
     }
 
 }

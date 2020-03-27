@@ -1,6 +1,7 @@
 package cn.northpark.flink.exactly.transactionway;
 
 import cn.northpark.flink.util.FlinkUtils;
+import com.twitter.chill.thrift.TBaseSerializer;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -11,8 +12,10 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.StringUtils;
+import org.apache.thrift.TBase;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /***
@@ -34,40 +37,19 @@ public class FlinkKafkaToMysql {
         DataStream<String> kafkaStream = FlinkUtils.createKafkaStream(parameters, SimpleStringSchema.class);
 
 
-        // 拆词
-        SingleOutputStreamOperator<String> words = kafkaStream.flatMap(new FlatMapFunction<String, String>() {
+        SingleOutputStreamOperator<Tuple3<String, String, String>> words = kafkaStream.flatMap(new FlatMapFunction<String, Tuple3<String, String, String>>() {
             @Override
-            public void flatMap(String value, Collector<String> out) throws Exception {
-                String[] words = value.split(" ");
-                for (String word : words) {
-                    if("Bruce".equalsIgnoreCase(word)){
-                        System.out.println(1/0);
-                    }
-                    if(!StringUtils.isNullOrWhitespaceOnly(word)){
+            public void flatMap(String value, Collector<Tuple3<String, String, String>> out) throws Exception {
+                    if(!StringUtils.isNullOrWhitespaceOnly(value)){
 
-                        out.collect(word);
+                        out.collect(Tuple3.of(UUID.randomUUID().toString(),value, LocalDateTime.now().toString()));
                     }
-                }
             }
         });
 
-        //把单词和1拼一块
-        SingleOutputStreamOperator<Tuple2<String, Integer>> wordAndOne = words.map(new MapFunction<String, Tuple2<String, Integer>>() {
-            @Override
-            public Tuple2<String, Integer> map(String value) throws Exception {
-                return Tuple2.of(value, 1);
-            }
-        });
+        words.print();
 
-        //分组、累加
-        SingleOutputStreamOperator<Tuple2<String, Integer>> sumed = wordAndOne.keyBy(0).sum(1);//.setParallelism(1);
-
-        sumed.map(new MapFunction<Tuple2<String, Integer>, Tuple3<String, String,String>>() {
-            @Override
-            public Tuple3<String, String, String> map(Tuple2<String, Integer> value) throws Exception {
-                return Tuple3.of(UUID.randomUUID().toString(),value.f0,value.f1.toString() );
-            }
-        }).addSink(new MySqlOracleTwoPhaseCommitSink());
+        words.addSink(new MySqlOracleTwoPhaseCommitSink());
 
 
         FlinkUtils.getEnv().execute("FlinkKafkaToMysql");

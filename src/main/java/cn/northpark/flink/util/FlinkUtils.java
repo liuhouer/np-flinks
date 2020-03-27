@@ -36,7 +36,7 @@ public class FlinkUtils {
         env.getCheckpointConfig().setMinPauseBetweenCheckpoints(1000);
 
         //检查点必须在10s之内完成，或者被丢弃【checkpoint超时时间】
-        env.getCheckpointConfig().setCheckpointTimeout(10000);
+//        env.getCheckpointConfig().setCheckpointTimeout(10000);
         //同一时间只允许进行一次检查点
         env.getCheckpointConfig().setMaxConcurrentCheckpoints(1);
 
@@ -49,7 +49,7 @@ public class FlinkUtils {
         //指定组ID
         props.setProperty("group.id", parameters.get("group.id"));
         //如果没有记录偏移量，第一次从最开始消费
-        props.setProperty("auto.offset.reset", parameters.get("auto.offset.reset","earliest"));
+//        props.setProperty("auto.offset.reset", parameters.get("auto.offset.reset","earliest"));
         //kafka的消费者不自动提交偏移量
         props.setProperty("enable.auto.commit", parameters.get("enable.auto.commit","false"));
 

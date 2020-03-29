@@ -76,13 +76,13 @@ public class DruidUtils {
      * @param  con
      * @date : 2017-10-16 10:08:10
      */
-    public static void close(Connection con) throws SQLException {
+    public static void close(Connection con)  {
         try {
             if (con != null) {
                 con.close();
             }
         } catch (SQLException e) {
-            throw new SQLException("关闭连接时异常", e);
+           e.printStackTrace();
         }finally {
             try {
                 if (con != null) {
@@ -90,7 +90,7 @@ public class DruidUtils {
                 }
 
             } catch (SQLException e) {
-                throw new SQLException("关闭连接时异常", e);
+                e.printStackTrace();
             }
         }
     } // end method
@@ -101,7 +101,7 @@ public class DruidUtils {
     /**
      * 提交事务
      */
-    public static void commit(Connection conn) throws SQLException {
+    public static void commit(Connection conn)  {
         if (conn != null) {
             try {
                 conn.commit();
@@ -119,7 +119,7 @@ public class DruidUtils {
      *
      * @param conn
      */
-    public static void rollback(Connection conn) throws SQLException {
+    public static void rollback(Connection conn) {
         if (conn != null) {
             try {
                 conn.rollback();

@@ -1,5 +1,7 @@
 package cn.northpark.flink.exactly.transactionway;
 
+import cn.northpark.flink.util.DruidUtils;
+import cn.northpark.flink.util.HikariUtils;
 import cn.northpark.flink.util.ManualJdbcPoolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.ExecutionConfig;
@@ -55,6 +57,7 @@ public class MySqlTwoPhaseCommitSink extends TwoPhaseCommitSinkFunction<Tuple3<S
 //        String url = "jdbc:mysql://localhost:3306/flink?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&autoReconnect=true";
 //        Connection connection = HikariUtils.getConnection(url, "root", "123456");
         Connection connection = ManualJdbcPoolUtil.getConnection(false);
+//        Connection connection = DruidUtils.getConnection();
         log.info("start beginTransaction......." + connection);
         return connection;
     }
@@ -78,7 +81,7 @@ public class MySqlTwoPhaseCommitSink extends TwoPhaseCommitSinkFunction<Tuple3<S
     @Override
     protected void commit(Connection connection) {
         log.info("start commit......." + connection);
-//        HikariUtils.commit(connection);
+//        DruidUtils.commit(connection);
 
         ManualJdbcPoolUtil.commit(connection);
     }
@@ -91,7 +94,7 @@ public class MySqlTwoPhaseCommitSink extends TwoPhaseCommitSinkFunction<Tuple3<S
     @Override
     protected void abort(Connection connection) {
         log.info("start abort rollback......." + connection);
-//        HikariUtils.rollback(connection);
+//        DruidUtils.rollback(connection);
 
         ManualJdbcPoolUtil.rollBack(connection);
     }

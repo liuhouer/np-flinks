@@ -38,6 +38,10 @@ public class FlinkKafkaToMysql {
             public void flatMap(String value, Collector<Tuple3<String, String, String>> out) throws Exception {
                     if(!StringUtils.isNullOrWhitespaceOnly(value)){
 
+                        if("AAA".equalsIgnoreCase(value)){
+                            System.out.println(1/0);
+                        }
+
                         out.collect(Tuple3.of(UUID.randomUUID().toString(),value, LocalDateTime.now().toString()));
                     }
             }

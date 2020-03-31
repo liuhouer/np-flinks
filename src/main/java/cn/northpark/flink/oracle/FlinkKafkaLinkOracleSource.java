@@ -1,5 +1,7 @@
-package cn.northpark.flink.exactly.transactionway;
+package cn.northpark.flink.oracle;
 
+import cn.northpark.flink.exactly.transactionway.FlinkKafkaToMysql;
+import cn.northpark.flink.project.ActivityBean;
 import cn.northpark.flink.util.FlinkUtils;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -15,10 +17,10 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /***
- * Flink从kafka读取数据写入Oracle 并且实现exactly once
+ * flink 读取kafka数据结合Oracle查询 整合数据
  * @author bruce
  */
-public class FlinkKafkaToOracle {
+public class FlinkKafkaLinkOracleSource {
 
     public static void main(String[] args) throws  Exception{
 
@@ -29,27 +31,11 @@ public class FlinkKafkaToOracle {
         DataStream<String> kafkaStream = FlinkUtils.createKafkaStream(parameters, SimpleStringSchema.class);
 
 
-        SingleOutputStreamOperator<Tuple3<String, String, String>> words = kafkaStream.flatMap(new FlatMapFunction<String, Tuple3<String, String, String>>() {
-            @Override
-            public void flatMap(String value, Collector<Tuple3<String, String, String>> out) throws Exception {
-                if (!StringUtils.isNullOrWhitespaceOnly(value)) {
+        SingleOutputStreamOperator<Tuple3<String, String, String>> tupleData = kafkaStream.map(new OracleToTupleFunciton());
 
-//                    if ("AAA".equalsIgnoreCase(value)) {
-//                        System.out.println(1 / 0);
-//                    }
+        tupleData.print();
 
-                    out.collect(Tuple3.of(UUID.randomUUID().toString(), value, LocalDateTime.now().toString()));
-                }
-            }
-        });
-
-        words.print();
-
-
-        words.addSink(new OracleTwoPhaseCommitSink());
-
-
-        FlinkUtils.getEnv().execute("FlinkKafkaToOracle");
+        FlinkUtils.getEnv().execute("FlinkKafkaLinkOracleSource");
 
     }
 }

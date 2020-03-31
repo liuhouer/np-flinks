@@ -55,4 +55,44 @@ public class FlinkKafkaToMysql {
         FlinkUtils.getEnv().execute("FlinkKafkaToMysql");
 
     }
+
+    /***
+     * Flink从kafka读取数据写入Oracle 并且实现exactly once
+     * @author bruce
+     */
+    public static class FlinkKafkaToOracle {
+
+        public static void main(String[] args) throws  Exception{
+
+            InputStream is = FlinkKafkaToMysql.class.getClassLoader().getResourceAsStream("config.properties");
+
+            ParameterTool parameters = ParameterTool.fromPropertiesFile(is);
+
+            DataStream<String> kafkaStream = FlinkUtils.createKafkaStream(parameters, SimpleStringSchema.class);
+
+
+            SingleOutputStreamOperator<Tuple3<String, String, String>> words = kafkaStream.flatMap(new FlatMapFunction<String, Tuple3<String, String, String>>() {
+                @Override
+                public void flatMap(String value, Collector<Tuple3<String, String, String>> out) throws Exception {
+                    if (!StringUtils.isNullOrWhitespaceOnly(value)) {
+
+    //                    if ("AAA".equalsIgnoreCase(value)) {
+    //                        System.out.println(1 / 0);
+    //                    }
+
+                        out.collect(Tuple3.of(UUID.randomUUID().toString(), value, LocalDateTime.now().toString()));
+                    }
+                }
+            });
+
+            words.print();
+
+
+            words.addSink(new OracleTwoPhaseCommitSink());
+
+
+            FlinkUtils.getEnv().execute("FlinkKafkaToOracle");
+
+        }
+    }
 }

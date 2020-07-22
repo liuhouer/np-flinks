@@ -53,6 +53,14 @@ under the License.
 
 	<dependencies>
 
+		<!-- https://mvnrepository.com/artifact/org.rocksdb/rocksdbjni -->
+		<dependency>
+			<groupId>org.rocksdb</groupId>
+			<artifactId>rocksdbjni</artifactId>
+			<version>6.10.2</version>
+		</dependency>
+
+
 		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>

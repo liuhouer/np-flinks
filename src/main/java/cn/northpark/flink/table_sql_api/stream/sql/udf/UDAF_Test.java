@@ -83,7 +83,7 @@ public class UDAF_Test {
         DataStream<UserBrowseLog> browseStream=streamEnv
                 .addSource(new FlinkKafkaConsumer<>(browseTopic, new SimpleStringSchema(), browseProperties))
                 .process(new BrowseKafkaProcessFunction())
-                .assignTimestampsAndWatermarks(new BrowseBoundedOutOfOrdernessTimestampExtractor(Time.seconds(5)));
+                .assignTimestampsAndWatermarks(new BrowseBoundedOutOfOrdernessTimestampExtractor(Time.seconds(0)));
 
         // 增加一个额外的字段rowtime为事件时间属性
         tableEnv.registerDataStream("source_kafka",browseStream,"userID,eventTime,eventTimeTimestamp,eventType,productID,productPrice,rowtime.rowtime");
@@ -99,12 +99,12 @@ public class UDAF_Test {
         //基于事件时间，maxOutOfOrderness为5秒，滚动窗口，计算10秒内每个商品被浏览的总价值
         String sql = ""
                 + "	select "
-                + "		UDFTimestampConverter(TUMBLE_START(rowtime, INTERVAL '10' SECOND),'YYYY-MM-dd HH:mm:ss') as window_start, "
-                + "		UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL '10' SECOND),'YYYY-MM-dd HH:mm:ss','+08:00') as window_end, "
+                + "		UDFTimestampConverter(TUMBLE_START(rowtime, INTERVAL '2' SECOND),'YYYY-MM-dd HH:mm:ss') as window_start, "
+                + "		UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL '2' SECOND),'YYYY-MM-dd HH:mm:ss','+08:00') as window_end, "
                 + "		productID, "
                 + "		UDAFSum(productPrice) as sumPrice"
                 + "	from source_kafka "
-                + "	group by productID,TUMBLE(rowtime, INTERVAL '10' SECOND)";
+                + "	group by productID,TUMBLE(rowtime, INTERVAL '2' SECOND)";
 
         Table table = tableEnv.sqlQuery(sql);
         tableEnv.toAppendStream(table,Row.class).print();

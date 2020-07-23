@@ -10,7 +10,7 @@ import java.io.IOException;
  * @date 2020年07月22日 17:58:03
  */
 public interface RocksSaveable {
-    void save(RocksDB rocksDB) throws IOException, RocksDBException;
+    void save(RocksDB rocksDB) throws Exception;
 
-    void deleteFromRocks(RocksDB rocksDB) throws RocksDBException;
+    void deleteFromRocks(RocksDB rocksDB) throws Exception;
 }

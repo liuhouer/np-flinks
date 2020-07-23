@@ -48,7 +48,10 @@ public class RocksFsBase {
         }
         try {
             byte[] bytes = rocksDB.get(ObjectUtil.objectToBytes(key));
-            return ObjectUtil.bytesToObject(bytes);
+            if(bytes!=null){
+                return ObjectUtil.bytesToObject(bytes);
+            }
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
         }

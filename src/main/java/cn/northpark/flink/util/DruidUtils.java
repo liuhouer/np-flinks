@@ -17,12 +17,18 @@ import java.util.Properties;
  */
 @Slf4j
 public class DruidUtils {
-    /** 默认配置文件名 */
-    public static String confile = "druid.properties";
-    /** 配置文件 */
-    public static Properties p = null;
-    /** 唯一dateSource，保证全局只有一个数据库连接池 */
-    public static DataSource dataSource = null;
+    /**
+     * 默认配置文件名
+     */
+    private transient static String confile = "druid.properties";
+    /**
+     * 配置文件
+     */
+    private transient static Properties p = null;
+    /**
+     * 唯一dateSource，保证全局只有一个数据库连接池
+     */
+    private transient static DataSource dataSource = null;
 
 
     static {
@@ -53,7 +59,8 @@ public class DruidUtils {
 
     } // end static
 
-
+    private DruidUtils() {
+    }
 
     /**
      * 获取连接
@@ -61,11 +68,7 @@ public class DruidUtils {
      * @return
      */
     public static Connection getConnection() throws SQLException {
-        try {
-            return dataSource.getConnection();
-        } catch (SQLException e) {
-            throw new SQLException("获取连接时异常", e);
-        }
+        return dataSource.getConnection();
 
     }
 
@@ -76,61 +79,6 @@ public class DruidUtils {
      * @param  con
      * @date : 2017-10-16 10:08:10
      */
-    public static void close(Connection con)  {
-        try {
-            if (con != null) {
-                con.close();
-            }
-        } catch (SQLException e) {
-           e.printStackTrace();
-        }finally {
-            try {
-                if (con != null) {
-                    con.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    } // end method
-
-
-    //非自动提交时需要手动提交|回滚...====================================================
-
-    /**
-     * 提交事务
-     */
-    public static void commit(Connection conn)  {
-        if (conn != null) {
-            try {
-                conn.commit();
-            } catch (SQLException e) {
-                log.error("提交事物失败,Connection:" + conn);
-                e.printStackTrace();
-            } finally {
-                close(conn);
-            }
-        }
-    }
-
-    /**
-     * 事物回滚
-     *
-     * @param conn
-     */
-    public static void rollback(Connection conn) {
-        if (conn != null) {
-            try {
-                conn.rollback();
-            } catch (SQLException e) {
-                log.error("事物回滚失败,Connection:" + conn);
-                e.printStackTrace();
-            } finally {
-                close(conn);
-            }
-        }
-    }
 
 }
 

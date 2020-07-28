@@ -1,8 +1,6 @@
 package cn.northpark.flink.exactly.transactionway;
 
-import cn.northpark.flink.util.DruidUtils;
 import cn.northpark.flink.util.HikariUtils;
-import cn.northpark.flink.util.ManualJdbcPoolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.common.typeutils.base.VoidSerializer;
@@ -12,27 +10,28 @@ import org.apache.flink.streaming.api.functions.sink.TwoPhaseCommitSinkFunction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * mysql通过两阶段提交，实现消费的exactly-once(不多不少，仅消费一次)
  */
 @Slf4j
-public class MySqlTwoPhaseCommitSink extends TwoPhaseCommitSinkFunction<Tuple3<String, String, String>, Connection, Void> {
+public class MySqlTwoPhaseCommitSink extends TwoPhaseCommitSinkFunction<Tuple3<String, String, String>, MySqlTwoPhaseCommitSink.ConnectionState, Void> {
 
 
     public MySqlTwoPhaseCommitSink() {
 
-        super(new KryoSerializer<>(Connection.class, new ExecutionConfig()), VoidSerializer.INSTANCE);
+        super(new KryoSerializer<>(MySqlTwoPhaseCommitSink.ConnectionState.class, new ExecutionConfig()), VoidSerializer.INSTANCE);
 
     }
 
 
     @Override
-    protected void invoke(Connection connection, Tuple3<String, String, String> objectNode, Context context) throws Exception {
+    protected void invoke(MySqlTwoPhaseCommitSink.ConnectionState connectionState, Tuple3<String, String, String> objectNode, Context context) throws Exception {
         System.err.println("start invoke.......");
 //        String value = objectNode.get("value").toString();
 //        ActivityBean activityBean = JSON.parseObject(value, ActivityBean.class);
-
+        Connection connection = connectionState.connection;
         log.info("---------------------->", connection);
         String sql = "insert into t_word_counts values (?,?,?)";
         PreparedStatement ps = connection.prepareStatement(sql);
@@ -52,51 +51,71 @@ public class MySqlTwoPhaseCommitSink extends TwoPhaseCommitSinkFunction<Tuple3<S
      * @throws Exception
      */
     @Override
-    protected Connection beginTransaction() throws Exception {
+    protected MySqlTwoPhaseCommitSink.ConnectionState beginTransaction() throws Exception {
 
-//        String url = "jdbc:mysql://localhost:3306/flink?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&autoReconnect=true";
-//        Connection connection = HikariUtils.getConnection(url, "root", "123456");
-        Connection connection = ManualJdbcPoolUtil.getConnection(false);
-//        Connection connection = DruidUtils.getConnection();
+        Connection connection = HikariUtils.getConnection();
+
         log.info("start beginTransaction......." + connection);
-        return connection;
+
+        return new ConnectionState(connection);
     }
 
     /**
      * 预提交，这里预提交的逻辑在invoke方法中
      *
-     * @param connection
+     * @param connectionState
      * @throws Exception
      */
     @Override
-    protected void preCommit(Connection connection) throws Exception {
-        log.info("start preCommit......." + connection);
+    protected void preCommit(MySqlTwoPhaseCommitSink.ConnectionState connectionState) throws Exception {
+        log.info("start preCommit......." + connectionState);
     }
 
     /**
      * 如果invoke方法执行正常，则提交事务
      *
-     * @param connection
+     * @param connectionState
      */
     @Override
-    protected void commit(Connection connection) {
-        log.info("start commit......." + connection);
-//        DruidUtils.commit(connection);
+    protected void commit(MySqlTwoPhaseCommitSink.ConnectionState connectionState) {
+        log.info("start commit......." + connectionState);
 
-        ManualJdbcPoolUtil.commit(connection);
+        Connection connection = connectionState.connection;
+
+        try {
+            connection.commit();
+            connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException("提交事物异常");
+        }
     }
 
     /**
      * 如果invoke执行异常则回滚事物，下一次的checkpoint操作也不会执行
      *
-     * @param connection
+     * @param connectionState
      */
     @Override
-    protected void abort(Connection connection) {
-        log.info("start abort rollback......." + connection);
-//        DruidUtils.rollback(connection);
+    protected void abort(MySqlTwoPhaseCommitSink.ConnectionState connectionState) {
+        log.info("start abort rollback......." + connectionState);
+        Connection connection = connectionState.connection;
+        try {
+            connection.rollback();
+            connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException("回滚事物异常");
+        }
+    }
 
-        ManualJdbcPoolUtil.rollBack(connection);
+    static class ConnectionState {
+
+        private final transient Connection connection;
+
+        ConnectionState(Connection connection) {
+
+            this.connection = connection;
+        }
+
     }
 
 }

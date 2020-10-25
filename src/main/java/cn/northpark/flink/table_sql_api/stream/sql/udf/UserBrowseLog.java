@@ -2,6 +2,7 @@
 package cn.northpark.flink.table_sql_api.stream.sql.udf;
 
 import javax.annotation.Generated;
+
 import com.google.gson.annotations.Expose;
 
 @Generated("net.hexar.json2pojo")
@@ -20,6 +21,9 @@ public class UserBrowseLog {
     private String userID;
     @Expose
     private Long eventTimeTimestamp;
+
+
+    private String orderID;
 
     public String getEventTime() {
         return eventTime;
@@ -69,4 +73,11 @@ public class UserBrowseLog {
         this.eventTimeTimestamp = eventTimeTimestamp;
     }
 
+    public String getOrderID() {
+        return orderID;
+    }
+
+    public void setOrderID(String orderID) {
+        this.orderID = orderID;
+    }
 }

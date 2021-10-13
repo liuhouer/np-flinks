@@ -1,21 +1,11 @@
 package cn.northpark.flink.table_sql_api.batch;
 
 import cn.northpark.flink.WordCount;
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.operators.DataSource;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.table.api.Table;
-import org.apache.flink.table.api.java.BatchTableEnvironment;
-import org.apache.flink.types.Row;
-import org.apache.flink.util.Collector;
-
-import java.util.Arrays;
+import org.apache.flink.table.api.bridge.java.BatchTableEnvironment;
 
 /**
  * @author bruce

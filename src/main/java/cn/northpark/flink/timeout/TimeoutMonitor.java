@@ -1,3 +1,34 @@
+package cn.northpark.flink.timeout;
+
+import cn.northpark.flink.table_sql_api.stream.sql.udf.UDF_Test;
+import cn.northpark.flink.util.RichParameterTool;
+import cn.northpark.flink.util.TimeUtils;
+import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.api.common.state.ValueState;
+import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.streaming.api.TimeCharacteristic;
+import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.ProcessFunction;
+import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
+import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import org.apache.flink.util.Collector;
+import org.apache.flink.util.OutputTag;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.util.Properties;
+
 /**
  * @author liuhouer
  * @date 2020年12月14日
@@ -52,6 +83,7 @@
  *
  * </pre>
  */
+@Slf4j
 public class TimeoutMonitor {
 
 
@@ -154,7 +186,7 @@ public class TimeoutMonitor {
             @Override
             public void processElement(TimeOutResult timeOutResult, Context context, Collector<Object> collector) throws Exception {
                 //写入数据库
-                TimeOutLogHelper.logMessage(timeOutResult,null);
+//                TimeOutLogHelper.logMessage(timeOutResult,null);
             }
         }).print();
 
@@ -185,7 +217,7 @@ public class TimeoutMonitor {
 
                 out.collect(log);
             } catch (Exception ex) {
-                LoggerUtils.error("解析Kafka数据异常...", ex);
+                log.error("解析Kafka数据异常...", ex);
             }
         }
     }

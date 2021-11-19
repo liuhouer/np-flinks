@@ -10,6 +10,7 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.operators.DataSource;
+import org.apache.flink.api.java.operators.FilterOperator;
 import org.apache.flink.api.java.operators.FlatMapOperator;
 import org.apache.flink.api.java.operators.MapOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -32,17 +33,14 @@ public class NorthParkSTT {
 		//2.read
 		DataSource<String> readTextFile = env.readTextFile("C:\\Users\\Bruce\\Desktop\\STT.log");
 		
-		readTextFile.print();
 
 		//3.transform
-		MapOperator<String, StatisticsVO> map = readTextFile.map(new MapFunction<String, StatisticsVO>() {
+		FilterOperator<StatisticsVO> map = readTextFile.map(new MapFunction<String, StatisticsVO>() {
 
 			@Override
 			public StatisticsVO map(String value) throws Exception {
 				int start_index = value.indexOf("[Statistics Info]^");
 				String replace_1 = value.substring(start_index).replace("[Statistics Info]^", "");
-
-
 
 
 //				JSONObject jsonObject = JSON.parseObject(sub_string);
@@ -52,15 +50,20 @@ public class NorthParkSTT {
 				return vo;
 			}
 
+		}).filter(new FilterFunction<StatisticsVO>() {
+			@Override
+			public boolean filter(StatisticsVO value) throws Exception {
+				return value.url != null;
+			}
 		});
 
 		//统计url
-		map.flatMap(new FlatMapFunction<StatisticsVO, Tuple2<String,Integer>>() {
-			@Override
-			public void flatMap(StatisticsVO value, Collector<Tuple2<String, Integer>> out) throws Exception {
-				out.collect(Tuple2.of(value.url, 1));
-			}
-		}).groupBy(0).sum(1).print();
+//		map.flatMap(new FlatMapFunction<StatisticsVO, Tuple2<String,Integer>>() {
+//			@Override
+//			public void flatMap(StatisticsVO value, Collector<Tuple2<String, Integer>> out) throws Exception {
+//				out.collect(Tuple2.of(value.url, 1));
+//			}
+//		}).groupBy(0).sum(1).print();
 
 		//统计用户
 		map.filter(new FilterFunction<StatisticsVO>() {
@@ -77,18 +80,18 @@ public class NorthParkSTT {
 		}).groupBy(0).sum(1).print();
 
 		//统计用户+请求页面次数
-		map.filter(new FilterFunction<StatisticsVO>() {
-			@Override
-			public boolean filter(StatisticsVO vo) throws Exception {
-
-				return vo.userVO != null;
-			}
-		}).flatMap(new FlatMapFunction<StatisticsVO, Tuple2<String,Integer>>() {
-			@Override
-			public void flatMap(StatisticsVO value, Collector<Tuple2<String, Integer>> out) throws Exception {
-				out.collect(Tuple2.of(value.userVO.username+"_"+value.url, 1));
-			}
-		}).groupBy(0).sum(1).print();
+//		map.filter(new FilterFunction<StatisticsVO>() {
+//			@Override
+//			public boolean filter(StatisticsVO vo) throws Exception {
+//
+//				return vo.userVO != null;
+//			}
+//		}).flatMap(new FlatMapFunction<StatisticsVO, Tuple2<String,Integer>>() {
+//			@Override
+//			public void flatMap(StatisticsVO value, Collector<Tuple2<String, Integer>> out) throws Exception {
+//				out.collect(Tuple2.of(value.userVO.username+"_"+value.url, 1));
+//			}
+//		}).groupBy(0).sum(1).print();
 
 //		map.groupBy("url").sum(0).print();
 		//4.execute

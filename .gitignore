@@ -2,3 +2,4 @@
 .idea
 /backEnd/
 *.log
+redis.properties

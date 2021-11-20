@@ -19,6 +19,7 @@ import org.apache.flink.util.Collector;
 import redis.clients.jedis.Jedis;
 
 import java.io.InputStream;
+import java.util.Objects;
 
 /**
  * @author bruce
@@ -65,7 +66,7 @@ public class NorthParkSTT {
         });
 
 
-        //统计url
+        //统计url---
 
         map.flatMap(new FlatMapFunction<StatisticsVO, Tuple2<String, Integer>>() {
             @Override
@@ -101,13 +102,18 @@ public class NorthParkSTT {
                 }
             }
 
+            //STRING_X
+            //HASH[A:2,B:34]_√_2
+            //LIST[1,2,3,4,]_X
+            //SET[]_X
+            //ZSET[KEY,SCORE,]_√
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
-                jedis.hset("URL_STT", value.f0, value.f1.toString());
+                jedis.hset("URL_STT_H", value.f0, value.f1.toString());
             }
         });
 
-        //统计用户
+        //统计用户 user_5
         map.filter(new FilterFunction<StatisticsVO>() {
             @Override
             public boolean filter(StatisticsVO vo) throws Exception {
@@ -145,11 +151,11 @@ public class NorthParkSTT {
 
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
-                jedis.hset("USER_STT", value.f0, value.f1.toString());
+                jedis.hset("USER_STT_H", value.f0, value.f1.toString());
             }
         });
 
-        //统计用户+请求页面次数
+        //统计用户+请求页面次数 userA_uri 6
         map.filter(new FilterFunction<StatisticsVO>() {
             @Override
             public boolean filter(StatisticsVO vo) throws Exception {
@@ -187,7 +193,49 @@ public class NorthParkSTT {
 
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
-                jedis.hset("USER_ACTION_STT", value.f0, value.f1.toString());
+                jedis.hset("USER_ACTION_STT_H", value.f0, value.f1.toString());
+            }
+        });
+
+        //google bot请求页面次数
+        map.filter(new FilterFunction<StatisticsVO>() {
+            @Override
+            public boolean filter(StatisticsVO vo) throws Exception {
+
+                return Objects.nonNull(vo.cookieMap)  && vo.cookieMap.toString().contains("Googlebot");
+            }
+        }).flatMap(new FlatMapFunction<StatisticsVO, Tuple2<String, Integer>>() {
+            @Override
+            public void flatMap(StatisticsVO value, Collector<Tuple2<String, Integer>> out) throws Exception {
+                out.collect(Tuple2.of("G_BOT" + "_" + value.url, 1));
+            }
+        }).keyBy(0).sum(1).addSink(new RichSinkFunction<Tuple2<String, Integer>>() {
+
+            private transient Jedis jedis;
+
+            @Override
+            public void open(Configuration parameters) throws Exception {
+                ParameterTool params = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
+
+                super.open(parameters);
+                String ip = params.get("redis.ip");
+                int port = params.getInt("redis.port", 6379);
+                jedis = new Jedis(ip, port);
+                String pwd = params.get("redis.password", "");
+                jedis.auth(pwd);
+            }
+
+            @Override
+            public void close() throws Exception {
+                super.close();
+                if (jedis != null) {
+                    jedis.close();
+                }
+            }
+
+            @Override
+            public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
+                jedis.hset("GOOGLE_BOT_STT_H", value.f0, value.f1.toString());
             }
         });
 

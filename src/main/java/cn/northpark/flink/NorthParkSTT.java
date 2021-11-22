@@ -109,7 +109,7 @@ public class NorthParkSTT {
             //ZSET[KEY,SCORE,]_√
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
-                jedis.hset("URL_STT_H", value.f0, value.f1.toString());
+                jedis.zadd("URL_STT",  value.f1, value.f0);
             }
         });
 
@@ -151,7 +151,7 @@ public class NorthParkSTT {
 
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
-                jedis.hset("USER_STT_H", value.f0, value.f1.toString());
+                jedis.zadd("USER_STT", value.f1, value.f0);
             }
         });
 
@@ -193,7 +193,7 @@ public class NorthParkSTT {
 
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
-                jedis.hset("USER_ACTION_STT_H", value.f0, value.f1.toString());
+                jedis.zadd("USER_ACTION_STT", value.f1, value.f0);
             }
         });
 
@@ -235,7 +235,7 @@ public class NorthParkSTT {
 
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
-                jedis.hset("GOOGLE_BOT_STT_H", value.f0, value.f1.toString());
+                jedis.zadd("GOOGLE_BOT_STT",  value.f1, value.f0);
             }
         });
 

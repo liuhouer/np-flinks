@@ -2,7 +2,6 @@ package cn.northpark.flink;
 
 
 import cn.northpark.flink.bean.StatisticsVO;
-import cn.northpark.flink.util.PhoenixUtil;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.functions.FilterFunction;
@@ -10,13 +9,21 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.apache.flink.util.Collector;
 
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Objects;
+import java.util.Properties;
 
 /**
  * @author bruce
@@ -33,6 +40,12 @@ public class NorthParkSTT_HBase {
 
         //2.read
         DataStreamSource<String> readTextFile = env.readTextFile("C:\\Users\\Bruce\\Desktop\\STT.log");
+
+
+        InputStream is = NorthParkSTT.class.getClassLoader().getResourceAsStream("phoenix.properties");
+        ParameterTool parameterTool = ParameterTool.fromPropertiesFile(is);
+
+        env.getConfig().setGlobalJobParameters(parameterTool);
 
 
         //3.transform
@@ -72,6 +85,30 @@ public class NorthParkSTT_HBase {
                 return value.f0;
             }
         }).sum(1).addSink(new RichSinkFunction<Tuple2<String, Integer>>() {
+            private transient Connection conn;
+
+            @Override
+            public void open(Configuration parameters) throws Exception {
+                super.open(parameters);
+                ParameterTool params = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
+
+                Properties props = new Properties();
+                props.setProperty("phoenix.schema.isNamespaceMappingEnabled", "true");
+                props.setProperty("phoenix.schema.mapSystemTablesToNamespace", "true");
+                String driverClassName = params.get("driverClassName");
+                String jdbcUrl = params.get("jdbcUrl");
+
+                Class.forName(driverClassName);
+                conn = DriverManager.getConnection(jdbcUrl,props);
+            }
+
+            @Override
+            public void close() throws Exception {
+                super.close();
+                if(conn !=null){
+                    conn.close();
+                }
+            }
 
             //STRING_X
             //HASH[A:2,B:34]_√_2
@@ -81,7 +118,15 @@ public class NorthParkSTT_HBase {
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
                 String sql = "UPSERT INTO \"stt\".URL_STT (URL,SCORE) VALUES ('"+value.f0+"',"+value.f1+")";
-                PhoenixUtil.insertData(sql);
+                try {
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    String msg = ps.executeUpdate() >0 ? "插入成功..."
+                            :"插入失败...";
+                    conn.commit();
+                    System.out.println(msg);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -100,11 +145,44 @@ public class NorthParkSTT_HBase {
         }).keyBy(0).sum(1).addSink(new RichSinkFunction<Tuple2<String, Integer>>() {
 
 
+            private transient Connection conn;
+
+            @Override
+            public void open(Configuration parameters) throws Exception {
+                super.open(parameters);
+                ParameterTool params = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
+
+                Properties props = new Properties();
+                props.setProperty("phoenix.schema.isNamespaceMappingEnabled", "true");
+                props.setProperty("phoenix.schema.mapSystemTablesToNamespace", "true");
+                String driverClassName = params.get("driverClassName");
+                String jdbcUrl = params.get("jdbcUrl");
+
+                Class.forName(driverClassName);
+                conn = DriverManager.getConnection(jdbcUrl,props);
+            }
+
+            @Override
+            public void close() throws Exception {
+                super.close();
+                if(conn !=null){
+                    conn.close();
+                }
+            }
+
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
 
-                String sql = "UPSERT INTO \"stt\".USER_STT (USERNAME,SCORE) VALUES ('"+value.f0+"',"+value.f1+")";
-                PhoenixUtil.insertData(sql);
+                String sql = "UPSERT INTO \"stt\".USER_STT (USER_NAME,SCORE) VALUES ('"+value.f0+"',"+value.f1+")";
+                try {
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    String msg = ps.executeUpdate() >0 ? "插入成功..."
+                            :"插入失败...";
+                    conn.commit();
+                    System.out.println(msg);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -123,11 +201,44 @@ public class NorthParkSTT_HBase {
         }).keyBy(0).sum(1).addSink(new RichSinkFunction<Tuple2<String, Integer>>() {
 
 
+            private transient Connection conn;
+
+            @Override
+            public void open(Configuration parameters) throws Exception {
+                super.open(parameters);
+                ParameterTool params = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
+
+                Properties props = new Properties();
+                props.setProperty("phoenix.schema.isNamespaceMappingEnabled", "true");
+                props.setProperty("phoenix.schema.mapSystemTablesToNamespace", "true");
+                String driverClassName = params.get("driverClassName");
+                String jdbcUrl = params.get("jdbcUrl");
+
+                Class.forName(driverClassName);
+                conn = DriverManager.getConnection(jdbcUrl,props);
+            }
+
+            @Override
+            public void close() throws Exception {
+                super.close();
+                if(conn !=null){
+                    conn.close();
+                }
+            }
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
 
+
                 String sql = "UPSERT INTO \"stt\".USER_ACTION_STT (USER_URL,SCORE) VALUES ('"+value.f0+"',"+value.f1+")";
-                PhoenixUtil.insertData(sql);
+                try {
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    String msg = ps.executeUpdate() >0 ? "插入成功..."
+                            :"插入失败...";
+                    conn.commit();
+                    System.out.println(msg);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -145,12 +256,44 @@ public class NorthParkSTT_HBase {
             }
         }).keyBy(0).sum(1).addSink(new RichSinkFunction<Tuple2<String, Integer>>() {
 
+            private transient Connection conn;
+
+            @Override
+            public void open(Configuration parameters) throws Exception {
+                super.open(parameters);
+                ParameterTool params = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
+
+                Properties props = new Properties();
+                props.setProperty("phoenix.schema.isNamespaceMappingEnabled", "true");
+                props.setProperty("phoenix.schema.mapSystemTablesToNamespace", "true");
+                String driverClassName = params.get("driverClassName");
+                String jdbcUrl = params.get("jdbcUrl");
+
+                Class.forName(driverClassName);
+                conn = DriverManager.getConnection(jdbcUrl,props);
+            }
+
+            @Override
+            public void close() throws Exception {
+                super.close();
+                if(conn !=null){
+                    conn.close();
+                }
+            }
 
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
 
                 String sql = "UPSERT INTO \"stt\".GOOGLE_BOT_STT (URL,SCORE) VALUES ('"+value.f0+"',"+value.f1+")";
-                PhoenixUtil.insertData(sql);
+                try {
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    String msg = ps.executeUpdate() >0 ? "插入成功..."
+                            :"插入失败...";
+                    conn.commit();
+                    System.out.println(msg);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         });
 

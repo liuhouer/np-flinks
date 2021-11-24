@@ -28,7 +28,7 @@ import java.util.Properties;
 /**
  * @author bruce
  * NorthPark多维度分析统计请求日志
- * 每天把统计结果写入clickhouse
+ * 每天把统计结果写入hbase
  */
 @Slf4j
 public class NorthParkSTT_HBase {

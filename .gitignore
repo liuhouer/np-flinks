@@ -3,3 +3,4 @@
 /backEnd/
 *.log
 redis.properties
+*.iml

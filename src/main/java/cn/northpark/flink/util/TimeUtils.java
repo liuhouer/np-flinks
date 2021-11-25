@@ -1665,6 +1665,28 @@ public class TimeUtils {
 		return  lastday;
 	}
 
+	/**
+	 * Unix时间互转（日期-毫秒）
+	 * @param timestamp
+	 * @return
+	 */
+	public static String Timestamp2DateStr(Long timestamp) {
+		try {
+			if(timestamp.toString().length()<=10){
+				timestamp = timestamp *1000;
+			}
+			Date date = new Date(timestamp);
+
+			String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+
+			return format;
+		}catch (Exception ig){
+			return TimeUtils.nowdate();
+		}
+
+
+	}
+
 	public static void main(String[] args) throws  Exception{
 //		String sameDayLastYear = getSameDayLastYear("20200527");
 //		System.out.println(sameDayLastYear);

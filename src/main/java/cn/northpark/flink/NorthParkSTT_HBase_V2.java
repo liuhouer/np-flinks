@@ -2,6 +2,7 @@ package cn.northpark.flink;
 
 
 import cn.northpark.flink.bean.StatisticsVO;
+import cn.northpark.flink.util.HbaseJdbcPoolUtil;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.functions.FilterFunction;
@@ -9,7 +10,6 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -17,21 +17,19 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.apache.flink.util.Collector;
 
-import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Objects;
-import java.util.Properties;
 
 /**
  * @author bruce
  * NorthPark多维度分析统计请求日志
  * 每天把统计结果写入hbase
+ * 利用自定义连接池减少资源消耗
  */
 @Slf4j
-public class NorthParkSTT_HBase {
+public class NorthParkSTT_HBase_V2 {
 
     public static void main(String[] args) throws Exception {
 
@@ -40,12 +38,6 @@ public class NorthParkSTT_HBase {
 
         //2.read
         DataStreamSource<String> readTextFile = env.readTextFile("C:\\Users\\Bruce\\Desktop\\STT.log");
-
-
-        InputStream is = NorthParkSTT.class.getClassLoader().getResourceAsStream("phoenix.properties");
-        ParameterTool parameterTool = ParameterTool.fromPropertiesFile(is);
-
-        env.getConfig().setGlobalJobParameters(parameterTool);
 
 
         //3.transform
@@ -90,24 +82,13 @@ public class NorthParkSTT_HBase {
             @Override
             public void open(Configuration parameters) throws Exception {
                 super.open(parameters);
-                ParameterTool params = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
-
-                Properties props = new Properties();
-                props.setProperty("phoenix.schema.isNamespaceMappingEnabled", "true");
-                props.setProperty("phoenix.schema.mapSystemTablesToNamespace", "true");
-                String driverClassName = params.get("driverClassName");
-                String jdbcUrl = params.get("jdbcUrl");
-
-                Class.forName(driverClassName);
-                conn = DriverManager.getConnection(jdbcUrl,props);
+                conn = HbaseJdbcPoolUtil.getConnection();
             }
 
             @Override
             public void close() throws Exception {
                 super.close();
-                if(conn !=null){
-                    conn.close();
-                }
+                HbaseJdbcPoolUtil.closeConnection(conn);
             }
 
             //STRING_X
@@ -150,24 +131,13 @@ public class NorthParkSTT_HBase {
             @Override
             public void open(Configuration parameters) throws Exception {
                 super.open(parameters);
-                ParameterTool params = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
-
-                Properties props = new Properties();
-                props.setProperty("phoenix.schema.isNamespaceMappingEnabled", "true");
-                props.setProperty("phoenix.schema.mapSystemTablesToNamespace", "true");
-                String driverClassName = params.get("driverClassName");
-                String jdbcUrl = params.get("jdbcUrl");
-
-                Class.forName(driverClassName);
-                conn = DriverManager.getConnection(jdbcUrl,props);
+                conn = HbaseJdbcPoolUtil.getConnection();
             }
 
             @Override
             public void close() throws Exception {
                 super.close();
-                if(conn !=null){
-                    conn.close();
-                }
+                HbaseJdbcPoolUtil.closeConnection(conn);
             }
 
             @Override
@@ -206,24 +176,13 @@ public class NorthParkSTT_HBase {
             @Override
             public void open(Configuration parameters) throws Exception {
                 super.open(parameters);
-                ParameterTool params = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
-
-                Properties props = new Properties();
-                props.setProperty("phoenix.schema.isNamespaceMappingEnabled", "true");
-                props.setProperty("phoenix.schema.mapSystemTablesToNamespace", "true");
-                String driverClassName = params.get("driverClassName");
-                String jdbcUrl = params.get("jdbcUrl");
-
-                Class.forName(driverClassName);
-                conn = DriverManager.getConnection(jdbcUrl,props);
+                conn = HbaseJdbcPoolUtil.getConnection();
             }
 
             @Override
             public void close() throws Exception {
                 super.close();
-                if(conn !=null){
-                    conn.close();
-                }
+                HbaseJdbcPoolUtil.closeConnection(conn);
             }
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
@@ -261,24 +220,13 @@ public class NorthParkSTT_HBase {
             @Override
             public void open(Configuration parameters) throws Exception {
                 super.open(parameters);
-                ParameterTool params = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
-
-                Properties props = new Properties();
-                props.setProperty("phoenix.schema.isNamespaceMappingEnabled", "true");
-                props.setProperty("phoenix.schema.mapSystemTablesToNamespace", "true");
-                String driverClassName = params.get("driverClassName");
-                String jdbcUrl = params.get("jdbcUrl");
-
-                Class.forName(driverClassName);
-                conn = DriverManager.getConnection(jdbcUrl,props);
+                conn = HbaseJdbcPoolUtil.getConnection();
             }
 
             @Override
             public void close() throws Exception {
                 super.close();
-                if(conn !=null){
-                    conn.close();
-                }
+                HbaseJdbcPoolUtil.closeConnection(conn);
             }
 
             @Override

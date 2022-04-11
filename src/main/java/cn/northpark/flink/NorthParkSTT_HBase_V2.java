@@ -98,7 +98,7 @@ public class NorthParkSTT_HBase_V2 {
             //ZSET[KEY,SCORE,]_√
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
-                String sql = "UPSERT INTO \"stt\".URL_STT_20220321 (URL,SCORE) VALUES ('"+value.f0+"',"+value.f1+")";
+                String sql = "UPSERT INTO \"stt\".URL_STT_20220411 (URL,SCORE) VALUES ('"+value.f0+"',"+value.f1+")";
                 try {
                     PreparedStatement ps = conn.prepareStatement(sql);
                     String msg = ps.executeUpdate() >0 ? "插入成功..."
@@ -143,7 +143,7 @@ public class NorthParkSTT_HBase_V2 {
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
 
-                String sql = "UPSERT INTO \"stt\".USER_STT_20220321 (USER_NAME,SCORE) VALUES ('"+value.f0+"',"+value.f1+")";
+                String sql = "UPSERT INTO \"stt\".USER_STT_20220411 (USER_NAME,SCORE) VALUES ('"+value.f0+"',"+value.f1+")";
                 try {
                     PreparedStatement ps = conn.prepareStatement(sql);
                     String msg = ps.executeUpdate() >0 ? "插入成功..."
@@ -188,7 +188,7 @@ public class NorthParkSTT_HBase_V2 {
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
 
 
-                String sql = "UPSERT INTO \"stt\".USER_ACTION_STT_20220321 (USER_URL,SCORE) VALUES ('"+value.f0+"',"+value.f1+")";
+                String sql = "UPSERT INTO \"stt\".USER_ACTION_STT_20220411 (USER_URL,SCORE) VALUES ('"+value.f0+"',"+value.f1+")";
                 try {
                     PreparedStatement ps = conn.prepareStatement(sql);
                     String msg = ps.executeUpdate() >0 ? "插入成功..."
@@ -232,7 +232,7 @@ public class NorthParkSTT_HBase_V2 {
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
 
-                String sql = "UPSERT INTO \"stt\".GOOGLE_BOT_STT_20220321 (URL,SCORE) VALUES ('"+value.f0+"',"+value.f1+")";
+                String sql = "UPSERT INTO \"stt\".GOOGLE_BOT_STT_20220411 (URL,SCORE) VALUES ('"+value.f0+"',"+value.f1+")";
                 try {
                     PreparedStatement ps = conn.prepareStatement(sql);
                     String msg = ps.executeUpdate() >0 ? "插入成功..."

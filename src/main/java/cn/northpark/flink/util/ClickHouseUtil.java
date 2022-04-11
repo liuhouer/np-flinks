@@ -182,10 +182,10 @@ public class ClickHouseUtil {
 
 
     public static void main(String[] args) {
-        List<Map<String, String>> list = getList("bruce.version_ck");
+        List<Map<String, String>> list = getList("test.pk_emp05");
         System.err.println(list);
 
-        List<String> tables = getTables("bruce");
+        List<String> tables = getTables("test");
         System.err.println(tables);
     }
 }

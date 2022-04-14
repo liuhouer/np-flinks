@@ -7,6 +7,10 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 
 import java.util.Properties;
 
+/**
+ * 执行程序的参数
+ * --topics flink000 --group.id bruce --bootstrap.servers node1:9092
+ */
 public class FlinkUtilsV1 {
 
     public static final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();

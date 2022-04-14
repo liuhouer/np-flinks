@@ -18,6 +18,7 @@ import java.util.Properties;
 /**
  * @author bruce
  * @date 2022年04月14日 10:45:37
+ * 执行程序的参数:配置kafka配置文件的绝对路径
  */
 public class FlinkUtilsV2 {
     private static StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();

@@ -85,4 +85,37 @@ public class FlinkTumblingWindowsLeftJoinDemo {
             return w.f0;
         }
     }
+
+    // left join
+    // coGroup算子
+    //coGroup算子也是基于window窗口机制，不过coGroup算子比Join算子更加灵活，可以按照用户指定的逻辑匹配左流或右流数据并输出。
+    //
+    //换句话说，我们通过自己指定双流的输出来达到left join和right join的目的。
+    //
+    //现在来看看在相同场景下coGroup算子是如何实现left join:
+    //
+    //#这里看看java算子的写法
+    //orderDetailStream
+    //  .coGroup(orderStream)
+    //  .where(r -> r.getOrderId())
+    //  .equalTo(r -> r.getOrderId())
+    //  .window(TumblingProcessingTimeWindows.of(Time.seconds(60)))
+    //  .apply(new CoGroupFunction<OrderDetail, Order, Tuple2<String, Long>>() {
+    //    @Override
+    //    public void coGroup(Iterable<OrderDetail> orderDetailRecords, Iterable<Order> orderRecords, Collector<Tuple2<String, Long>> collector)  {
+    //      for (OrderDetail orderDetaill : orderDetailRecords) {
+    //        boolean flag = false;
+    //        for (Order orderRecord : orderRecords) {
+    //          // 右流中有对应的记录
+    //          collector.collect(new Tuple2<>(orderDetailRecords.getGoods_name(), orderDetailRecords.getGoods_price()));
+    //          flag = true;
+    //        }
+    //        if (!flag) {
+    //          // 右流中没有对应的记录
+    //          collector.collect(new Tuple2<>(orderDetailRecords.getGoods_name(), null));
+    //        }
+    //      }
+    //    }
+    //  })
+    //  .print();
 }

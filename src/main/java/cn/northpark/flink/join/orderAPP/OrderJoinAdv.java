@@ -1,49 +1,57 @@
-package cn.northpark.flink.join;
+package cn.northpark.flink.join.orderAPP;
 
 import cn.northpark.flink.util.FlinkUtilsV2;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.flink.api.common.functions.CoGroupFunction;
+import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
+import org.apache.flink.streaming.api.functions.windowing.AllWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
+import org.apache.flink.util.OutputTag;
+
+import java.sql.Connection;
 
 /**
  * @author bruce
- * @date 2022年04月14日 10:44:04
+ * @date 2022年04月14日 10:49:45
  *
+ * <pre>订单数据和迟到数据join的实现</pre>
  *
- * 在各种各样的系统中，都订单数据表
- *     订单表：订单主表、订单明细表
+ * 分析
+ * 要想统计，需要将两个表中的数据拉取到Flink做Join关联。
+ * 即要在同一个窗口中关联，就要划分窗口。
+ * 划分窗口后，数据就有可能迟到，要处理迟到的数据。
+ * 业务系统中数据，基本都是存储在关系型数据库中，如Mysql
+ * 通过canal这个工具，可以把mysql中的业务数据，导入到kafka中（canal伪装成Mysql的Salve）
+ * Flink通过 KafkaSource 从kafka中拉取业务数据
+ * 拉取到的数据，要做处理，并将主表、从表关联起来（join）
+ * 按EventTime划分窗口，处理迟到的数据
+ * 然后再做统计成交金额
  *
- *     订单主表：
- *         订单id、订单状态、订单总金额、订单的时间、用户ID
+ * 技术点
+ * canal的使用及原理
+ * kafka的生产者、消费者、Topic
+ * Flink的EventTime滚动窗口 ☆☆☆
+ * Flink的双流的LeftJoin ☆☆☆☆
+ * Flink的测流输出迟到数据 ☆☆☆☆☆
+ * Mysql的连接及查询 ☆☆
  *
- *     订单明细表：
- *         订单主表的ID、商品ID、商品的分类ID、商品的单价、商品的数量
- *
- * 统计某个分类的成交金额
- *     订单状态为成交的（主表中）
- *     商品的分类ID（明细表中）
- *     商品的金额即单价*数量（明细表中）
- *
- * 在京东或淘宝，下来一个单
- *     o1000，已支付，600,2020-06-29 19:42:00，feng
- *     p1, 100, 1, 食品
- *     p1, 200, 1, 食品
- *     p1, 300, 1, 食品
  */
-public class OrderJoin {
+public class OrderJoinAdv {
     public static void main(String[] args) throws Exception {
 
         ParameterTool parameters = ParameterTool.fromPropertiesFile(args[0]);
@@ -104,6 +112,7 @@ public class OrderJoin {
         });
 
         int delaySeconds = 2;
+        int windowSize = 5;
 
         //提取EventTime生成WaterMark
         SingleOutputStreamOperator<OrderMain> orderMainStreamWithWaterMark = orderMainDataStream.assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor<OrderMain>(Time.seconds(delaySeconds)) {
@@ -120,8 +129,46 @@ public class OrderJoin {
             }
         });
 
+        //定义迟到侧流输出的Tag
+        OutputTag<OrderDetail> lateTag = new OutputTag<OrderDetail>("late-date") {};
+
+        //对左表进行单独划分窗口，窗口的长度与cogroup的窗口长度一样
+        SingleOutputStreamOperator<OrderDetail> orderDetailWithWindow = orderDetailStreamWithWaterMark.windowAll(TumblingEventTimeWindows.of(Time.seconds(windowSize)))
+                .sideOutputLateData(lateTag) //将迟到的数据打上Tag
+                .apply(new AllWindowFunction<OrderDetail, OrderDetail, TimeWindow>() {
+                    @Override
+                    public void apply(TimeWindow window, Iterable<OrderDetail> values, Collector<OrderDetail> out) throws Exception {
+                        for (OrderDetail value : values) {
+                            //out.collect(value);
+                        }
+                    }
+                });
+
+        //获取迟到的数据
+        DataStream<OrderDetail> lateOrderDetailStream = orderDetailWithWindow.getSideOutput(lateTag);
+
+        //应为orderDetail表的数据迟到数据不是很多，没必要使用异步IO，直接使用RichMapFunction
+        SingleOutputStreamOperator<Tuple2<OrderDetail, OrderMain>> lateOrderDetailAndOrderMain = lateOrderDetailStream.map(new RichMapFunction<OrderDetail, Tuple2<OrderDetail, OrderMain>>() {
+
+            @Override
+            public void open(Configuration parameters) throws Exception {
+                //创建书库的连接
+            }
+
+            @Override
+            public Tuple2<OrderDetail, OrderMain> map(OrderDetail value) throws Exception {
+                return null;
+            }
+
+            @Override
+            public void close() throws Exception {
+                //关闭数据库的连接
+            }
+        });
+
+
         //Left Out JOIN，并且将订单明细表作为左表
-        DataStream<Tuple2<OrderDetail, OrderMain>> joined = orderDetailStreamWithWaterMark.coGroup(orderMainStreamWithWaterMark)
+        DataStream<Tuple2<OrderDetail, OrderMain>> joined = orderDetailWithWindow.coGroup(orderMainStreamWithWaterMark)
                 .where(new KeySelector<OrderDetail, Long>() {
                     @Override
                     public Long getKey(OrderDetail value) throws Exception {
@@ -134,7 +181,7 @@ public class OrderJoin {
                         return value.getOid();
                     }
                 })
-                .window(TumblingEventTimeWindows.of(Time.seconds(5)))
+                .window(TumblingEventTimeWindows.of(Time.seconds(windowSize)))
                 .apply(new CoGroupFunction<OrderDetail, OrderMain, Tuple2<OrderDetail, OrderMain>>() {
 
                     @Override
@@ -153,8 +200,42 @@ public class OrderJoin {
                     }
                 });
 
-        joined.print();
+        //join后，有可orderMain没有join上
+        SingleOutputStreamOperator<Tuple2<OrderDetail, OrderMain>> punctualOrderDetailAndOrderMain = joined.map(new RichMapFunction<Tuple2<OrderDetail, OrderMain>, Tuple2<OrderDetail, OrderMain>>() {
+
+            private transient Connection connection;
+
+            @Override
+            public void open(Configuration parameters) throws Exception {
+                //打开数据库连接
+            }
+
+            @Override
+            public Tuple2<OrderDetail, OrderMain> map(Tuple2<OrderDetail, OrderMain> tp) throws Exception {
+                //每个关联上订单主表的数据，就查询书库
+                if (tp.f1 == null) {
+                    OrderMain orderMain = queryOrderMainFromMySQL(tp.f0.getOrder_id(), connection);
+                    tp.f1 = orderMain;
+                }
+                return tp;
+            }
+
+            @Override
+            public void close() throws Exception {
+                //关闭数据库连接
+            }
+        });
+
+        //将准时的和迟到的UNION到一起
+        DataStream<Tuple2<OrderDetail, OrderMain>> allOrderStream = punctualOrderDetailAndOrderMain.union(lateOrderDetailAndOrderMain);
+
+        //根据具体的场景，写入到Kafka、Hbase、ES、ClickHouse
+        allOrderStream.print();
 
         FlinkUtilsV2.getEnv().execute();
+    }
+
+    private static OrderMain queryOrderMainFromMySQL(Long order_id, Connection connection) {
+        return null;
     }
 }

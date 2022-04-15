@@ -1,10 +1,56 @@
-package cn.northpark.flink.join;
+package cn.northpark.flink.join.orderAPP;
 
 import java.util.Date;
 
 /**
  * @author bruce
  * @date 2022年04月14日 10:43:31
+ * 数据预览
+ * https://s1.ax1x.com/2022/04/15/L3suvj.png
+ *
+ *
+ * OrderMain导入到Kafka中的数据：
+ * {
+ * 	"data": [{
+ * 		"oid": "29001",
+ * 		"create_time": "2020-03-16 00:38:01",
+ * 		"total_money": "2000.0",
+ * 		"status": "1",
+ * 		"update_time": "2020-03-16 00:38:01",
+ * 		"uid": "9999",
+ * 		"province": "北京市"
+ *        }],
+ * 	"database": "doit12",
+ * 	"es": 1584333481000,
+ * 	"id": 4,
+ * 	"isDdl": false,
+ * 	"mysqlType": {
+ * 		"oid": "bigint(20)",
+ * 		"create_time": "timestamp",
+ * 		"total_money": "double",
+ * 		"status": "int(11)",
+ * 		"update_time": "timestamp",
+ * 		"uid": "varchar(20)",
+ * 		"province": "varchar(50)"
+ *    },
+ * 	"old": null,
+ * 	"pkNames": ["oid"],
+ * 	"sql": "",
+ * 	"sqlType": {
+ * 		"oid": -5,
+ * 		"create_time": 93,
+ * 		"total_money": 8,
+ * 		"status": 4,
+ * 		"update_time": 93,
+ * 		"uid": 12,
+ * 		"province": 12
+ *    },
+ * 	"table": "ordermain",
+ * 	"ts": 1584333481540,
+ * 	"type": "INSERT"
+ * }
+ *
+ *
  */
 public class OrderMain {
     private Long oid;

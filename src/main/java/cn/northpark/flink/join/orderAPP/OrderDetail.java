@@ -1,10 +1,21 @@
-package cn.northpark.flink.join;
+package cn.northpark.flink.join.orderAPP;
 
 import java.util.Date;
 
 /**
  * @author bruce
  * @date 2022年04月14日 10:42:54
+ *
+ * 数据预览
+ * https://s1.ax1x.com/2022/04/15/L3sMKs.png
+ * OrderDetail导入到Kafka的数据：
+ * {"data":[{"id":"10","order_id":"29001","category_id":"2","sku":"20001","money":"1000.0","amount":"1",
+ * "create_time":"2020-03-16 00:38:01","update_time":"2020-03-16 00:38:01"}],"database":"doit12",
+ * "es":1584333481000,"id":4,"isDdl":false,"mysqlType":{"id":"bigint(20)","order_id":"bigint(20)",
+ * "category_id":"int(11)","sku":"varchar(50)","money":"double","amount":"int(11)",
+ * "create_time":"timestamp","update_time":"timestamp"},"old":null,"pkNames":["id"],"sql":"","sqlType":{"id
+ * ":-5,"order_id":-5,"category_id":4,"sku":12,"money":8,"amount":4,"create_time":93,"update_time":93}
+ * ,"table":"orderdetail","ts":1584333481600,"type":"INSERT"}
  */
 public class OrderDetail {
 

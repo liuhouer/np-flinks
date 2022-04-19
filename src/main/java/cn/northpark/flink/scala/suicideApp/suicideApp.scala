@@ -27,6 +27,22 @@ import org.apache.flink.api.scala.{ExecutionEnvironment, _}
  *       9	HDI for year	String	人类发展指数
  *       10	gdp_for_year ($)	String	年GDP
  *       11	gdp_per_capita ($)	String	人均GDP
+ *
+ *  //提交作业命令
+ *  $FLINK_HOMEbin/flink run -m yarn-cluster \
+ *  -ynm suicideAppJob \
+ *  -c cn.northpark.flink.scala.suicideApp.suicideApp \
+ *  -p 8 -yjm 1024m -ytm 1024m \
+ *  /home/hadoop/np-flink-scala-app-1.0-SNAPSHOT.jar
+ *
+ *
+ *  //提交到yarn上面运行作业
+ *  //$FLINK_HOME -配置flink客户端的路径 比如/home/hadoop/app/flink-1.12.1/
+ *  //-m 运行模式 [yarn-session/per-job]
+ *  //-c 指定执行函数
+ *  //-p 指定并行度
+ *  //-yjm 指定 jobmanager的内存
+ *  //-ytm 指定 taskmanager的内存
  */
 object  suicideApp {
 

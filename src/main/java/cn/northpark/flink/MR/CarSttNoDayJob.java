@@ -30,17 +30,27 @@ import java.net.URI;
  * 20210916 05:11:00	0.100000001	186	58270
  * 20210923 10:09:00	0.109999999	186	50190
  * 20211006 12:36:00	0.100000001	187	55431
+ *
+ *
+ *  //hadoop提交作业
+ *  1.hadoop jar np_hadoop-1.0-SNAPSHOT-jar-with-dependencies.jar hadoop.CarSttNoDayJob
+ *
+ *  //列出输出文件列表
+ *  2.hdfs dfs -ls /BigDataProject/A
+ *  
+ * //查看输出结果
+ *  3.hadoop fs -cat /BigDataProject/A/part-r-00000
  */
-public class CarSttJob {
+public class CarSttNoDayJob {
 
     // 定义输入路径
-    private static final String INPUT_PATH = "hdfs://node1:9000/BigDataProject/车载数据.csv";
+    private static final String INPUT_PATH = "/BigDataProject/车载数据.csv";
     // 定义输出路径
-    private static final String OUT_PATH = "hdfs://node1:9000/BigDataProject/A";
+    private static final String OUT_PATH = "/BigDataProject/A";
     /**
      * Map阶段
      */
-    public static class MyMapper extends Mapper<LongWritable, Text,Text,CarBean>{
+    public static class MyMapper extends Mapper<LongWritable, Text,Text, CarBean>{
         Logger logger = LoggerFactory.getLogger(MyMapper.class);
 
         private Text outK = new Text();
@@ -79,15 +89,16 @@ public class CarSttJob {
             outV.setNo(no);
 
             String date = "";
-            if(StringUtils.isNoneBlank(datetime)){
-                date = datetime.substring(0,10);
+            if(StringUtils.isNoneBlank(datetime) && datetime.length()>8){
+                date = datetime.substring(0,8);
+                outV.setDate(date);
+
+                outK.set(no + "    "+ date);//编号+日期为key
+
+                //5 写出
+                context.write(outK,outV);
             }
-            outV.setDate(date);
 
-            outK.set(date);
-
-            //5 写出
-            context.write(outK,outV);
         }
     }
 
@@ -131,9 +142,10 @@ public class CarSttJob {
 
             //组装结果
             CarBean rs =  new CarBean();
-            rs.setDate(k2.toString());
             rs.setSpeed(avg_speed.toString());
             rs.setUpSpeed(avg_up.toString());
+
+            System.err.println(rs.toString());
             // 把结果写出去
             context.write(k2,rs);
         }
@@ -148,7 +160,6 @@ public class CarSttJob {
             //指定Job需要的配置参数
             Configuration conf = new Configuration();
 
-
             // 创建文件系统
             FileSystem fileSystem = FileSystem.get(new URI(OUT_PATH), conf);
             // 如果输出目录存在，我们就删除
@@ -162,7 +173,7 @@ public class CarSttJob {
             Job job = Job.getInstance(conf);
 
             //注意了：这一行必须设置，否则在集群中执行的时候是找不到WordCountJob这个类的
-            job.setJarByClass(CarSttJob.class);
+            job.setJarByClass(CarSttNoDayJob.class);
             
             //指定输入路径（可以是文件，也可以是目录）
             FileInputFormat.setInputPaths(job, INPUT_PATH);

@@ -1,6 +1,7 @@
 package cn.northpark.flink.MR.bean;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Writable;
 
 import java.io.DataInput;
@@ -53,14 +54,23 @@ public class CarBean implements Writable {
 
     @Override
     public String toString() {
-        return "{" +
-                "  date='" + date + '\'' +
-                ", upSpeed='" + upSpeed + '\'' +
-                ", speed='" + speed + '\'' +
-                ", no='" + no + '\'' +
-                '}';
-    }
+        StringBuilder sb = new StringBuilder();
+        if (StringUtils.isNotEmpty(no)) {
+            sb.append(no).append("    ");
+        }
 
+        if (StringUtils.isNotEmpty(date)) {
+            sb.append(date).append("    ");
+        }
+        if (StringUtils.isNotEmpty(upSpeed)) {
+            sb.append(upSpeed).append("    ");
+        }
+        if (StringUtils.isNotEmpty(speed)) {
+            sb.append(speed).append("    ");
+        }
+
+        return sb.toString();
+    }
     @Override
     public void write(DataOutput dataOutput) throws IOException {
         dataOutput.writeUTF(date    );
@@ -75,5 +85,14 @@ public class CarBean implements Writable {
         this.upSpeed      =dataInput.readUTF();
         this.speed        =dataInput.readUTF();
         this.no           =dataInput.readUTF();
+    }
+
+    public static void main(String[] args) {
+        CarBean bean = new CarBean();
+        bean.setDate("2022-4-20");
+        bean.setSpeed("222");
+        bean.setUpSpeed("0.618");
+        bean.setNo("6188");
+        System.err.println(bean.toString());
     }
 }

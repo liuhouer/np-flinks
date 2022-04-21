@@ -1,16 +1,11 @@
 package cn.northpark.flink.util;
 
-import cn.northpark.flink.WordCount;
-import com.alibaba.druid.support.json.JSONUtils;
 import com.alibaba.fastjson.JSON;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.hdfs.web.JsonUtil;
 import org.rocksdb.InfoLogLevel;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 /**

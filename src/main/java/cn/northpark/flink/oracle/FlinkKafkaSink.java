@@ -1,7 +1,6 @@
 package cn.northpark.flink.oracle;
 
 import cn.northpark.flink.exactly.transactionway.FlinkKafkaToMysql;
-import cn.northpark.flink.oracle.SinkOracle;
 import cn.northpark.flink.util.FlinkUtils;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;

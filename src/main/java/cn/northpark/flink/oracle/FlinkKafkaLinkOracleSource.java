@@ -1,20 +1,14 @@
 package cn.northpark.flink.oracle;
 
 import cn.northpark.flink.exactly.transactionway.FlinkKafkaToMysql;
-import cn.northpark.flink.project.ActivityBean;
 import cn.northpark.flink.util.FlinkUtils;
-import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.util.Collector;
-import org.apache.flink.util.StringUtils;
 
 import java.io.InputStream;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 /***
  * flink 读取kafka数据结合Oracle查询 整合数据

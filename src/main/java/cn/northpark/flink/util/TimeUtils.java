@@ -1,6 +1,11 @@
 
 package cn.northpark.flink.util;
 
+import com.google.common.collect.ImmutableList;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.flink.shaded.guava18.com.google.common.base.Splitter;
+
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -9,19 +14,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
-
-
-import com.google.common.collect.ImmutableList;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.flink.shaded.guava18.com.google.common.base.Splitter;
+import java.util.*;
 
 /**
  * 时间工具类

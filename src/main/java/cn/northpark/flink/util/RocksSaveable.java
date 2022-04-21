@@ -1,9 +1,6 @@
 package cn.northpark.flink.util;
 
 import org.rocksdb.RocksDB;
-import org.rocksdb.RocksDBException;
-
-import java.io.IOException;
 
 /**
  * @author zhangyang

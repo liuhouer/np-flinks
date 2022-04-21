@@ -1,6 +1,5 @@
 package cn.northpark.flink.exactly.transactionway;
 
-import cn.northpark.flink.oracle.SinkOracle;
 import cn.northpark.flink.util.FlinkUtils;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;

@@ -10,7 +10,7 @@ import org.apache.flink.api.scala.{ExecutionEnvironment, _}
 
 
 /**
- *
+ * ！！！hadoop hdfs连接不上 直接把9000端口去掉就可以了！！！！
  * @author bruce
  * @date 2022年04月18日 10:48:03
  *
@@ -27,43 +27,28 @@ import org.apache.flink.api.scala.{ExecutionEnvironment, _}
  *       9	HDI for year	String	人类发展指数
  *       10	gdp_for_year ($)	String	年GDP
  *       11	gdp_per_capita ($)	String	人均GDP
- *
- *  //提交作业命令
- *  $FLINK_HOMEbin/flink run -m yarn-cluster \
- *  -ynm suicideAppJob \
- *  -c cn.northpark.flink.scala.suicideApp.suicideApp \
- *  -p 8 -yjm 1024m -ytm 1024m \
- *  /home/hadoop/np-flink-scala-app-1.0-SNAPSHOT.jar
- *
- *
- *  //提交到yarn上面运行作业
- *  //$FLINK_HOME -配置flink客户端的路径 比如/home/hadoop/app/flink-1.12.1/
- *  //-m 运行模式 [yarn-session/per-job]
- *  //-c 指定执行函数
- *  //-p 指定并行度
- *  //-yjm 指定 jobmanager的内存
- *  //-ytm 指定 taskmanager的内存
  */
 object  suicideApp {
 
   // 自定义类型
 //  case class Bean(
-//                   country: Int,
-//                   year: String,
+//                   country: String,
+//                   years: String,
 //                   sex: String,
 //                   age: String,
-//                   suicides_no: String,
+//                   suicides_no: int,
 //                   population: String,
-//                   suicides_100k_pop: String,
+//                   suicides_100k_pop: double,
 //                   country_year: String,
 //                   hdi_for_year: String,
-//                   gdp_for_year: String,
-//                   gdp_per_capita: String
+//                   gdp_for_year: int,
+//                   gdp_per_capita: int
 //
 //                 )
 
   def main(args: Array[String]): Unit = {
 
+    //todo -修改- 配置输出路径
     val BASE_OUT_DIR = "C:\\Users\\Bruce\\Desktop\\3\\"
 
     // 初始化执行环境
@@ -72,7 +57,7 @@ object  suicideApp {
     val tableEnv = BatchTableEnvironment.create(env)
 
 
-    val connectorDescriptor = new FileSystem().path("file:///C:\\Users\\Bruce\\Desktop\\master.csv")
+    val connectorDescriptor = new FileSystem().path("hdfs://node1/scd/master.csv")
 
     val tableSchema = new TableSchema.Builder()
       .field("country", Types.STRING)
@@ -104,8 +89,6 @@ object  suicideApp {
     //print all columns
 //    val all_metrics = tableEnv.sqlQuery("select * from scd  ")
 //    all_metrics.printSchema()
-//
-//
 //    tableEnv.toDataSet[Row](all_metrics).print()
 
 
@@ -140,29 +123,11 @@ object  suicideApp {
 
     //HDI metrics
     val hdi_metrics = tableEnv.sqlQuery(" select hdi_for_year ,nums from (select hdi_for_year,avg(suicides_no) as nums from scd  group by hdi_for_year ) where hdi_for_year IS NOT NULL  order by nums desc  ")
-//    HDI_metrics.printSchema()
     tableEnv.toDataSet[(String, Int)](hdi_metrics).print()
     tableEnv.toDataSet[(String, Int)](hdi_metrics).setParallelism(1).writeAsCsv(BASE_OUT_DIR+"hdi_metrics.csv","\n",",", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE)
 
 
     env.execute("suicideApp")
-
-    //哈哈哈:
-    //年龄：【（5-14），（15-24），（25-34），（35-54），（55-74），75+各个年龄阶段自杀人数之间的比较，】
-    //
-    //哈哈哈:
-    //   GDP:【不同年gdp下自杀率的比较，不同个人gdp下自杀率的比较】。
-    //
-    //哈哈哈:
-    //人口:【人口的多少对每100k pop自杀人数的影响】
-    //
-    //哈哈哈:
-    //人口发展指数（HDI）:【人口发展指数高低对自杀率的影响】
-
-
-
-
-
 
   }
 }

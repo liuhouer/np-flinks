@@ -14,25 +14,29 @@ import java.io.IOException;
 /**
  * Java代码操作HDFS
  * 文件操作：上传文件，下载文件，删除文件
+ * @date 2022年4月21日 测试成功！！
  *
  * Created by bruce
  */
 public class HdfsOp {
 
     public static void main(String[] args) throws Exception{
+        System.setProperty("HADOOP_USER_NAME", "root");
         //创建一个配置对象
         Configuration conf = new Configuration();
-        //指定HDFS的地址
-        conf.set("fs.defaultFS","hdfs://node1:9000");
+        //这里设置namenode
+        conf.set("fs.hdfs.impl", "org.apache.hadoop.hdfs.DistributedFileSystem");
+        conf.set("dfs.nameservices", "node1");
+        conf.set("fs.defaultFS", "hdfs://node1");
         //获取操作HDFS的对象
         FileSystem fileSystem = FileSystem.get(conf);
 
         //上传文件
-        put(fileSystem);
+//        put(fileSystem);
         //下载文件
         //get(fileSystem);
         //删除文件
-//        delete(fileSystem);
+        delete(fileSystem);
 
     }
 
@@ -45,7 +49,7 @@ public class HdfsOp {
         //删除文件，目录也可以删除
         //如果要递归删除目录，则第二个参数需要设置为true
         //如果删除的是文件或者空目录，第二个参数会被忽略
-        boolean flag = fileSystem.delete(new Path("/LICENSE.txt"),true);
+        boolean flag = fileSystem.delete(new Path("/BigDataProject/user.txt"),true);
         if(flag){
             System.out.println("删除成功!");
         }else{
@@ -74,7 +78,7 @@ public class HdfsOp {
      */
     private static void put(FileSystem fileSystem) throws IOException {
         //获取本地文件的输入流
-        FileInputStream fis = new FileInputStream("C:\\Users\\Bruce\\Desktop\\np\\大数据课程-车载数据.csv");
+        FileInputStream fis = new FileInputStream("C:\\Users\\Bruce\\Desktop\\np\\车载数据.csv");
         //获取HDFS文件系统的输出流
         FSDataOutputStream fos = fileSystem.create(new Path("/BigDataProject/user.txt"));
         //上传文件：通过工具类把输入流拷贝到输出流里面，实现本地文件上传到HDFS

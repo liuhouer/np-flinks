@@ -1,6 +1,5 @@
 package cn.northpark.flink.MR;
 
-import cn.northpark.flink.MR.bean.CarBean;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -50,11 +49,11 @@ public class CarSttDayJob {
     /**
      * Map阶段
      */
-    public static class MyMapper extends Mapper<LongWritable, Text,Text, CarBean>{
+    public static class MyMapper extends Mapper<LongWritable, Text,Text, hadoop.CarBean>{
         Logger logger = LoggerFactory.getLogger(MyMapper.class);
 
         private Text outK = new Text();
-        private CarBean outV = new CarBean();
+        private hadoop.CarBean outV = new hadoop.CarBean();
         /**
          * 需要实现map函数
          * 这个map函数就是可以接收<k1,v1>，产生<k2，v2>
@@ -107,7 +106,7 @@ public class CarSttDayJob {
     /**
      * Reduce阶段
      */
-    public static class MyReducer extends Reducer<Text,CarBean,Text,CarBean>{
+    public static class MyReducer extends Reducer<Text, hadoop.CarBean,Text, hadoop.CarBean>{
         Logger logger = LoggerFactory.getLogger(MyReducer.class);
 
         /**
@@ -119,7 +118,7 @@ public class CarSttDayJob {
          * @throws InterruptedException
          */
         @Override
-        protected void reduce(Text k2, Iterable<CarBean> beans, Context context)
+        protected void reduce(Text k2, Iterable<hadoop.CarBean> beans, Context context)
                 throws IOException, InterruptedException {
             //定义科目数量
             int count = 0;
@@ -127,7 +126,7 @@ public class CarSttDayJob {
             double sumUp = 0d;
             double sumSpeed = 0d;
             //对v2s中的数据进行累加求和
-            for(CarBean bean: beans){
+            for(hadoop.CarBean bean: beans){
                 //输出k2,v2的值
                 sumUp += Double.valueOf(bean.getUpSpeed());
                 sumSpeed += Double.valueOf(bean.getSpeed());
@@ -142,7 +141,7 @@ public class CarSttDayJob {
 
 
             //组装结果
-            CarBean rs =  new CarBean();
+            hadoop.CarBean rs =  new hadoop.CarBean();
             rs.setSpeed(avg_speed.toString());
             rs.setUpSpeed(avg_up.toString());
 
@@ -186,7 +185,7 @@ public class CarSttDayJob {
             //指定k2的类型
             job.setMapOutputKeyClass(Text.class);
             //指定v2的类型
-            job.setMapOutputValueClass(CarBean.class);
+            job.setMapOutputValueClass(hadoop.CarBean.class);
 
 
             //指定reduce相关的代码
@@ -194,7 +193,7 @@ public class CarSttDayJob {
             //指定k3的类型
             job.setOutputKeyClass(Text.class);
             //指定v3的类型
-            job.setOutputValueClass(CarBean.class);
+            job.setOutputValueClass(hadoop.CarBean.class);
 
             //提交job
             job.waitForCompletion(true);

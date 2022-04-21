@@ -1,6 +1,5 @@
 package cn.northpark.flink.MR;
 
-import cn.northpark.flink.MR.bean.CarBean;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -106,7 +105,7 @@ public class CarSttNoDayJob {
     /**
      * Reduce阶段
      */
-    public static class MyReducer extends Reducer<Text,CarBean,Text,CarBean>{
+    public static class MyReducer extends Reducer<Text, CarBean,Text, CarBean>{
         Logger logger = LoggerFactory.getLogger(MyReducer.class);
 
         /**

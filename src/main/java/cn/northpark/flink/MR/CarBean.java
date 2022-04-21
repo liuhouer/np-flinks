@@ -1,4 +1,4 @@
-package cn.northpark.flink.MR.bean;
+package cn.northpark.flink.MR;
 
 
 import org.apache.commons.lang3.StringUtils;

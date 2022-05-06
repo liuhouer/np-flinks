@@ -11,6 +11,7 @@ import org.apache.flink.api.scala.{ExecutionEnvironment, _}
 
 /**
  * ！！！hadoop hdfs连接不上 直接把9000端口去掉就可以了！！！！
+ *
  * @author bruce
  * @date 2022年04月18日 10:48:03
  *
@@ -27,6 +28,18 @@ import org.apache.flink.api.scala.{ExecutionEnvironment, _}
  *       9	HDI for year	String	人类发展指数
  *       10	gdp_for_year ($)	String	年GDP
  *       11	gdp_per_capita ($)	String	人均GDP
+ *
+ *       Jeey:
+ *       年龄：【（5-14），（15-24），（25-34），（35-54），（55-74），75+各个年龄阶段自杀人数之间的比较，】
+ *
+ *       Jeey:
+ *       GDP:【不同年gdp下自杀率的比较，不同个人gdp下自杀率的比较】。
+ *
+ *       Jeey:
+ *       人口:【人口的多少对每100k pop自杀人数的影响】
+ *
+ *       Jeey:
+ *       人口发展指数（HDI）:【人口发展指数高低对自杀率的影响】
  */
 object  suicideApp {
 

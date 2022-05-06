@@ -26,7 +26,7 @@ object ReadTableCsvFile {
     val tableEnv = BatchTableEnvironment.create(env)
 
 
-    val inputHDFS: DataSet[Bean] = env.readCsvFile[Bean]("hdfs://node1/scd/master.csv", ignoreFirstLine = true,lineDelimiter="\n",fieldDelimiter = ",")
+    val inputHDFS: DataSet[Bean] = env.readCsvFile[Bean]("C:\\Users\\Bruce\\Desktop\\np\\master.csv", ignoreFirstLine = true,lineDelimiter="\n",fieldDelimiter = ",")
 
 
     inputHDFS.print();
@@ -57,9 +57,9 @@ object ReadTableCsvFile {
 
 
     //gdp per   metrics
-    val gdp_per_metrics = tableEnv.sqlQuery("select years,avg(CAST(gdp_per_capita AS Int)) as gdp,avg(CAST(suicides_no AS Int)) as nums from scd group by years order by nums desc ")
+    val gdp_per_metrics = tableEnv.sqlQuery("select years,avg(CAST(gdp_per_capita AS Double)) as gdp,avg(CAST(suicides_no AS Int)) as nums from scd group by years order by nums desc ")
     tableEnv.toDataSet[Row](gdp_per_metrics).print()
-    tableEnv.toDataSet[(String,Int, Int)](gdp_per_metrics).setParallelism(1).writeAsCsv(BASE_OUT_DIR+"gdp_per_metrics.csv","\n",",", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE)
+    tableEnv.toDataSet[(String,Double, Int)](gdp_per_metrics).setParallelism(1).writeAsCsv(BASE_OUT_DIR+"gdp_per_metrics.csv","\n",",", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE)
 
 
     //population metrics

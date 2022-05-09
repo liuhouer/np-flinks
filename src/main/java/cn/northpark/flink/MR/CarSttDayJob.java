@@ -18,6 +18,15 @@ import java.io.IOException;
 import java.net.URI;
 
 /**
+ *
+ * 利用HDFS和MapReduce完成相应计算任务。具体要求如下：
+ * 1、	编写程序将文件中的数据写入HDFS，具体路径/BigDataProject/raw_data.txt
+ * 2、	编写MapReduce程序，完成相应具体分析计算
+ * 文件《车载数据》的具体要求：
+ * 数据格式说明：日期（yyyymmdd hh24:mi:ss）,幅值，速度，仪器编号
+ * A、计算每台仪器每天的加速度平均值和速度平均值
+ * B、计算每天的加速度平均值和速度平均值
+ *
  * 需求：计算每天的加速度平均值和速度平均值
  *
  *日期	                加速度幅值	速度	仪器编号

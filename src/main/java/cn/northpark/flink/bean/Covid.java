@@ -36,8 +36,8 @@ public class Covid {
     private String today_severe;//当日新增重症
     private String today_storeConfirm;//当日现存确诊
 
-    private String storeConfirm;//现存确诊
-    private Double deadRate;//病死率
+    private String store_confirm;//现存确诊
+    private Double dead_rate;//病死率
 
     public Covid() {
     }

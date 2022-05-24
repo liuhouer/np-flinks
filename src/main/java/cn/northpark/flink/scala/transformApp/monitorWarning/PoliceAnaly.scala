@@ -24,10 +24,10 @@ object PoliceAnaly {
     env.setParallelism(1)
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
     //获取违法信息
-    val violationInfoDS: DataStream[String] = env.socketTextStream("mynode5",9999)
+    val violationInfoDS: DataStream[String] = env.socketTextStream("node5",9999)
 
     //获取出警信息
-    val policeInfoDS: DataStream[String] = env.socketTextStream("mynode5",8888)
+    val policeInfoDS: DataStream[String] = env.socketTextStream("node5",8888)
 
     //对违法车辆数据进行转换
     val violationTransferDS: DataStream[ViolationCarInfo] = violationInfoDS.map(line => {

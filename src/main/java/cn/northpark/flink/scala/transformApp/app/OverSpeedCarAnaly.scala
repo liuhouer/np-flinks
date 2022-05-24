@@ -28,7 +28,7 @@ object OverSpeedCarAnaly {
 
     //设置Kafka 配置
     val props = new Properties()
-    props.setProperty("bootstrap.servers","mynode1:9092,mynode2:9092,mynode3:9092")
+    props.setProperty("bootstrap.servers","node1:9092,node2:9092,node3:9092")
     props.setProperty("key.deserializer",classOf[StringSerializer].getName)
     props.setProperty("value.deserializer",classOf[StringSerializer].getName)
     props.setProperty("group.id","group1125")
@@ -36,7 +36,7 @@ object OverSpeedCarAnaly {
     val kafkaSource: FlinkKafkaConsumerBase[String] = new FlinkKafkaConsumer[String]("monitortopic1125",new SimpleStringSchema(),props).setStartFromEarliest()
     //读取车辆监控信息
     val ds1: DataStream[String] = env.addSource(kafkaSource)
-//    val ds1: DataStream[String] = env.socketTextStream("mynode5",9999)
+//    val ds1: DataStream[String] = env.socketTextStream("node5",9999)
 
     //对车辆监控信息进行转换数据
     val carMonitorDS: DataStream[MonitorCarInfo] = ds1.map(line => {

@@ -25,7 +25,7 @@ object RTLocCarAnaly {
     //kafka 配置
 
     val props = new Properties()
-    props.setProperty("bootstrap.servers","mynode1:9092,mynode2:9092,mynode3:9092")
+    props.setProperty("bootstrap.servers","node1:9092,node2:9092,node3:9092")
     props.setProperty("key.deserializer",classOf[StringDeserializer].getName)
     props.setProperty("value.deserializer",classOf[StringDeserializer].getName)
     props.setProperty("group.id","group112601")

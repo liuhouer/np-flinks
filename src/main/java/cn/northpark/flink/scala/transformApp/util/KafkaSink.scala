@@ -30,7 +30,7 @@ class KafkaSink[T](cls:String)(topic: String) extends RichSinkFunction[T] {
 
     //向kafka中写入
 
-    producer.send( new ProducerRecord[String,String](topic,JSON.toJSONString(info)))
+    producer.send( new ProducerRecord[String,String](topic,info.toString))
 
   }
 

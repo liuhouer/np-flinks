@@ -32,7 +32,7 @@ object CarTrackerAnaly {
 
     //Kafka 配置
     val props = new Properties()
-    props.setProperty("bootstrap.servers","mynode1:9092,mynode2:9092,mynode3:9092")
+    props.setProperty("bootstrap.servers","node1:9092,node2:9092,node3:9092")
     props.setProperty("key.deserializer",classOf[StringDeserializer].getName)
     props.setProperty("value.deserializer",classOf[StringDeserializer].getName)
     props.setProperty("group.id","group1126")
@@ -136,7 +136,7 @@ object CarTrackerAnaly {
 //      //初始化RichSinkFunction 执行一次
 //      override def open(parameters: Configuration): Unit = {
 //        configuration = HBaseConfiguration.create()
-//        configuration.set("hbase.zookeeper.quorum","mynode3:2181,mynode4:2181,mynode5:2181")
+//        configuration.set("hbase.zookeeper.quorum","node3:2181,node4:2181,node5:2181")
 //        conn = ConnectionFactory.createConnection(configuration)
 //      }
 //

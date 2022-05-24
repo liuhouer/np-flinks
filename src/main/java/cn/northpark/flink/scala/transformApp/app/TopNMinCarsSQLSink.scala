@@ -88,7 +88,7 @@ object TopNMinCarsSQLSink {
     //读取Kafka 中监控到实时的车辆信息
     val monitorInfosDs: DataStream[String] = env.addSource(new FlinkKafkaConsumer[String]("flink_traffic5",new SimpleStringSchema(),props).setStartFromEarliest())
     //数据类型转换
-    val transferDS: DataStream[MonitorCarBean] = monitorInfosDs.map(line => {
+    var transferDS: DataStream[MonitorCarBean] = monitorInfosDs.map(line => {
       val arr: Array[String] = line.split("\t")
       MonitorCarBean(arr(0), arr(1), arr(2), arr(3), arr(4).toLong, arr(5), arr(6).toDouble)
     }).assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[MonitorCarBean](Time.seconds(5)) {
@@ -97,8 +97,19 @@ object TopNMinCarsSQLSink {
 
 //    transferDS.print("接收到消息并转为实体：")
 
+    transferDS =  transferDS
+                  .filter(_.monitorId !="")  //过滤空数据/错误数据
+                  .keyBy( data => (data.areaId, data.roadId, data.monitorId) )//按key分区Shuffle统计数据
+
+
+    //为特定数据量大的分区单独给Task计算划分
+    transferDS = transferDS.filter(_.monitorId =="02")
+      .startNewChain()
+
+
     //每隔10秒钟统计过去60秒钟，最通畅的top5通道信息
-    val top5MonitorInfoDS: DataStream[Top5MonitorBean] = transferDS.timeWindowAll(Time.seconds(60), Time.seconds(10))
+    val top5MonitorInfoDS: DataStream[Top5MonitorBean] = transferDS
+      .timeWindowAll(Time.seconds(60), Time.seconds(10))
       .process(new ProcessAllWindowFunction[MonitorCarBean, Top5MonitorBean, TimeWindow] {
         //context :Flink 上下文，elements : 窗口期内所有元素，out: 回收数据对象
         override def process(context: Context, elements: Iterable[MonitorCarBean], out: Collector[Top5MonitorBean]): Unit = {
@@ -151,6 +162,7 @@ object TopNMinCarsSQLSink {
         }
       })
 
+
     //打印结果
     top5MonitorInfoDS.print("计算TOP n");
 
@@ -173,7 +185,7 @@ object TopNMinCarsSQLSink {
       it._2
     })
 
-    factInfo.print()
+//    factInfo.print()
 
     //把flinksql数据写入到csv
     factInfo.writeAsCsv(BASE_OUT_DIR+"monitorM", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE,"\n",",")

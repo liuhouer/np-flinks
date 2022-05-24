@@ -22,10 +22,10 @@ object MakeData {
     val pw = new PrintWriter("C:\\Users\\Bruce\\Desktop\\3\\trafficdata")
     //创建kafka配置
     val props = new Properties()
-    props.setProperty("bootstrap.servers","mynode1:9092,mynode2:9092,mynode3:9092")
+    props.setProperty("bootstrap.servers","node1:9092,node2:9092,node3:9092")
     props.setProperty("key.serializer",classOf[StringSerializer].getName)
     props.setProperty("value.serializer",classOf[StringSerializer].getName)
-
+    props.setProperty("auto.offset.reset","latest")
     //创建Kafka Producer
     val producer = new KafkaProducer[String,String](props)
 
@@ -34,7 +34,7 @@ object MakeData {
     val random = new Random()
     val generator = new GaussianRandomGenerator(new JDKRandomGenerator())
 
-    for(i <- 1 to 3000){
+    for(i <- 1 to 30000){
       //模拟车辆
       val car = locations(random.nextInt(10))+(65+random.nextInt(26)).toChar+random.nextInt(99999).formatted("%05d")
       //模拟每辆车通过的卡扣数 ，一辆车每天通过卡扣数可能是大部分都不超过100个卡扣
@@ -61,7 +61,7 @@ object MakeData {
         //向文件中写入
         pw.println(info)
         //向kafka中写入
-        producer.send( new ProducerRecord[String,String]("monitortopic1125",info))
+        producer.send( new ProducerRecord[String,String]("flink_traffic5",info))
       }
     }
     pw.close()

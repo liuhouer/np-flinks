@@ -63,6 +63,28 @@ public class KafkaString {
 
 
     }
+
+    /**
+     * 发送String序列化的kafka消息
+     * @param props
+     * @param topic
+     * @param msg
+     */
+    public synchronized static void sendKafkaObject(Properties props , String topic , Object msg) {
+
+        KafkaProducer<String, Object> producer = new KafkaProducer<String, Object>(props);
+        try {
+            log.info("kafka Send :["+topic+"]"+"--->"+msg);
+            producer.send(new ProducerRecord<String, Object>(topic, msg));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            producer.close();
+        }
+
+
+    }
     
     public static void main(String[] args) {
     	Properties properties = KafkaString.buildBasicKafkaProperty();

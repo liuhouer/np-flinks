@@ -1,4 +1,4 @@
-package cn.northpark.flink.MR;
+package cn.northpark.hadoop.MR;
 
 
 import org.apache.commons.lang3.StringUtils;

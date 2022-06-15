@@ -1,4 +1,4 @@
-package cn.northpark.flink.MR;
+package cn.northpark.hadoop.MR;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -18,15 +18,6 @@ import java.io.IOException;
 import java.net.URI;
 
 /**
- *
- * 利用HDFS和MapReduce完成相应计算任务。具体要求如下：
- * 1、	编写程序将文件中的数据写入HDFS，具体路径/BigDataProject/raw_data.txt
- * 2、	编写MapReduce程序，完成相应具体分析计算
- * 文件《车载数据》的具体要求：
- * 数据格式说明：日期（yyyymmdd hh24:mi:ss）,幅值，速度，仪器编号
- * A、计算每台仪器每天的加速度平均值和速度平均值
- * B、计算每天的加速度平均值和速度平均值
- *
  * 需求：计算每天的加速度平均值和速度平均值
  *
  *日期	                加速度幅值	速度	仪器编号
@@ -41,20 +32,20 @@ import java.net.URI;
  *
  *
  *  //hadoop提交作业
- *  1.hadoop jar np_hadoop-1.0-SNAPSHOT-jar-with-dependencies.jar hadoop.CarSttDayJob
+ *  1.hadoop jar np_hadoop-1.0-SNAPSHOT-jar-with-dependencies.jar hadoop.CarSttNoDayJob
  *
  *  //列出输出文件列表
- *  2.hdfs dfs -ls /BigDataProject/B
- *
+ *  2.hdfs dfs -ls /BigDataProject/A
+ *  
  * //查看输出结果
- *  3.hadoop fs -cat /BigDataProject/B/part-r-00000
+ *  3.hadoop fs -cat /BigDataProject/A/part-r-00000
  */
-public class CarSttDayJob {
+public class CarSttNoDayJob {
 
     // 定义输入路径
     private static final String INPUT_PATH = "/BigDataProject/车载数据.csv";
     // 定义输出路径
-    private static final String OUT_PATH = "/BigDataProject/B";
+    private static final String OUT_PATH = "/BigDataProject/A";
     /**
      * Map阶段
      */
@@ -96,13 +87,12 @@ public class CarSttDayJob {
             outV.setSpeed(speed);
             outV.setNo(no);
 
-
             String date = "";
             if(StringUtils.isNoneBlank(datetime) && datetime.length()>8){
                 date = datetime.substring(0,8);
                 outV.setDate(date);
 
-                outK.set(date);
+                outK.set(no + "    "+ date);//编号+日期为key
 
                 //5 写出
                 context.write(outK,outV);
@@ -182,7 +172,7 @@ public class CarSttDayJob {
             Job job = Job.getInstance(conf);
 
             //注意了：这一行必须设置，否则在集群中执行的时候是找不到WordCountJob这个类的
-            job.setJarByClass(CarSttDayJob.class);
+            job.setJarByClass(CarSttNoDayJob.class);
             
             //指定输入路径（可以是文件，也可以是目录）
             FileInputFormat.setInputPaths(job, INPUT_PATH);

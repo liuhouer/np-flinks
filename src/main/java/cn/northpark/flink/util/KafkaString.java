@@ -57,6 +57,7 @@ public class KafkaString {
             
         } catch (Exception e) {
             e.printStackTrace();
+            log.error(e.getMessage());
         } finally {
             producer.close();
         }
@@ -64,43 +65,28 @@ public class KafkaString {
 
     }
 
-    /**
-     * 发送String序列化的kafka消息
-     * @param props
-     * @param topic
-     * @param msg
-     */
-    public synchronized static void sendKafkaObject(Properties props , String topic , Object msg) {
 
-        KafkaProducer<String, Object> producer = new KafkaProducer<String, Object>(props);
-        try {
-            log.info("kafka Send :["+topic+"]"+"--->"+msg);
-            producer.send(new ProducerRecord<String, Object>(topic, msg));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            producer.close();
-        }
-
-
-    }
-    
     public static void main(String[] args) {
     	Properties properties = KafkaString.buildBasicKafkaProperty();
 //    	String msg = "[np_web][INFO] [2022-04-06 17:58:45] cn.northpark.aspect.HttpAspect.log(140) | [Statistics Info]^{\"class_method\":\"cn.northpark.action.MoviesAction.tag_list_page\",\"cookieMap\":{\"UA\":\"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)\"},\"ip\":\"172.17.0.2\",\"method\":\"GET\",\"url\":\"http://northpark.cn/movies/tag/juqing/page/1272\"}";
 //		KafkaString.sendKafkaString(properties,"flink000",msg);
-        while (true){
-            String msg = "02\t02\t01\t68773\t1653185731000\t京F99200\t29.11";
-            KafkaString.sendKafkaString(properties,"flink_traffic2",msg);
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
 
-	}
+
+//        while (true){
+//            String msg = "02\t02\t01\t68773\t1653185731000\t京F99200\t29.11";
+//            KafkaString.sendKafkaString(properties,"flink_traffic2",msg);
+//            try {
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+        String SIGN = "&&*$";
+        String keywordLimitTopic = "flink_sent1";//将flink统计好的关键词发送到kafka
+        KafkaString.sendKafkaString(properties,keywordLimitTopic, ("flink"+SIGN+2));
+
+
+    }
     
 
 }

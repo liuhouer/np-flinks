@@ -1,4 +1,4 @@
-package spark
+package cn.northpark.spark
 
 import java.util.Properties
 
@@ -11,7 +11,7 @@ import org.apache.spark.sql.{DataFrame, Row, SaveMode, SparkSession}
  * @author bruce
  * @date 2022年06月15日 16:18:43
  */
-object  scoreStt {
+object scoreStt {
 
   def main(args: Array[String]): Unit = {
 

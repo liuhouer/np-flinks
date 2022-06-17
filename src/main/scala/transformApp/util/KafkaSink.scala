@@ -2,7 +2,6 @@ package cn.northpark.flink.scala.transformApp.util
 
 import java.util.Properties
 
-import com.alibaba.fastjson.JSON
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.functions.sink.{RichSinkFunction, SinkFunction}
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}

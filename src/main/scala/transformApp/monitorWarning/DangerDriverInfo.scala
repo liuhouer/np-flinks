@@ -8,11 +8,9 @@ import cn.northpark.flink.scala.transformApp.util._
 import org.apache.flink.api.common.functions.RichMapFunction
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.cep.PatternSelectFunction
-import org.apache.flink.cep.scala.{CEP, PatternStream}
 import org.apache.flink.cep.scala.pattern.Pattern
+import org.apache.flink.cep.scala.{CEP, PatternStream}
 import org.apache.flink.configuration.Configuration
-import org.apache.flink.streaming.api.TimeCharacteristic
-import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.connectors.kafka.{FlinkKafkaConsumer, FlinkKafkaConsumerBase}

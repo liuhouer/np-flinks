@@ -7,6 +7,7 @@ import java.util.StringTokenizer;
  * @date 2022年06月25日 12:21:23
  */
 public class Test1 {
+
     public static void main(String[] args) {
         String exp = "shibazi_lin@126.com\t6584596";
         // 去掉所有的键盘上的不可输入字符，不包括双字节的，32-126

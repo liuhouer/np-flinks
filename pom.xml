@@ -129,6 +129,13 @@ under the License.
 
 
 
+		<!--flink-connector-rabbitmq_2.11-->
+		<dependency>
+			<groupId>org.apache.flink</groupId>
+			<artifactId>flink-connector-rabbitmq_2.11</artifactId>
+			<version>1.8.1</version>
+		</dependency>
+
 		<!--mysql-->
 		<dependency>
 			<groupId>mysql</groupId>

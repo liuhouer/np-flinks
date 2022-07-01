@@ -1,7 +1,7 @@
                     
 package cn.northpark.flink.util;
 
-import cn.northpark.flink.MQ.MerchantDaySta;
+import cn.northpark.flink.MerchantDayStaApp.MerchantDaySta;
 import com.alibaba.fastjson.JSON;
 import com.rabbitmq.client.*;
 import lombok.extern.slf4j.Slf4j;

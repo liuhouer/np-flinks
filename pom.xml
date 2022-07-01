@@ -259,6 +259,40 @@ under the License.
 			<version>${flink.version}</version>
 		</dependency>
 
+
+		<!--spark -->
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-core_2.11</artifactId>
+			<version>2.4.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-sql_2.11</artifactId>
+			<version>2.4.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-streaming_2.11</artifactId>
+			<version>2.4.4</version>
+		</dependency>
+		<!--spark -->
+
+		<!--mongodb-->
+		<dependency>
+		  <groupId>org.mongodb</groupId>
+		  <artifactId>mongo-java-driver</artifactId>
+		  <version>3.10.1</version>
+		</dependency>
+
+		<!--hutool-->
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-all</artifactId>
+			<version>5.3.5</version>
+		</dependency>
 		<!--
 			table & sql api dependencies ...............end
 		-->

@@ -1,6 +1,7 @@
 package cn.northpark.flink.vehicleAPP;
 
 import cn.northpark.flink.ReadKafkaSinkMysql;
+import cn.northpark.flink.util.TimeUtils;
 import cn.northpark.flink.vehicleAPP.bean.GPSRealData;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,6 @@ import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -22,15 +22,15 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
 
 import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.Properties;
 
 /**
  * @author bruce
- * @date 2022年07月01日 11:11:05
- * flink-3 ：
- * 生成一条消息发送到topic: json-vehicle-offline, 消费该topic生成一条车辆下线的记录;
+ * @date 2022年7月5日
+ * 队列超过3分钟没来消息 输出到其他队列下线处理
+ * 定时器+超时监控的实现（没涉及多判断，仅仅实现超时预警）
+ * BRUCE TIPS!!!
+ *
  */
 @Slf4j
 public class VehicleWithStatesHandleApp {
@@ -78,7 +78,7 @@ public class VehicleWithStatesHandleApp {
             @Override
             public GPSRealData map(String value) throws Exception {
 
-                log.info("flink_get_msg===,{}",value);
+                log.info("flink_get_msg==="+ TimeUtils.getNowTime() +"====,{}",value);
 
                 GPSRealData vo = JSON.parseObject(value, GPSRealData.class);
 
@@ -86,6 +86,8 @@ public class VehicleWithStatesHandleApp {
             }
 
         }).keyBy(new KeySelector<GPSRealData, Object>() {
+
+
             @Override
             public Object getKey(GPSRealData value) throws Exception {
                 return value.getSimNo();
@@ -93,12 +95,16 @@ public class VehicleWithStatesHandleApp {
         }).process(new ProcessFunction<GPSRealData, GPSRealData>() {
 
             private transient ValueState<Long> state;
+            private transient ValueState<GPSRealData> stateM;
             @Override
             public void open(Configuration parameters) throws Exception {
                 super.open(parameters);
 
                 ValueStateDescriptor<Long> descriptor = new ValueStateDescriptor<Long>("time-state", Types.LONG);
                 state = getRuntimeContext().getState(descriptor);
+
+                ValueStateDescriptor<GPSRealData> descriptor1 = new ValueStateDescriptor<GPSRealData>("M-state", GPSRealData.class);
+                stateM = getRuntimeContext().getState(descriptor1);
 
             }
 
@@ -113,12 +119,15 @@ public class VehicleWithStatesHandleApp {
                 //假设数据的sendTime就是我们要计算的3分钟间隔字段
                 Long sendTime = value.getSendTime();
 
+                Long trigTime  = sendTime + 3* 60 * 1000L;
+
 
                 // 注册一个定时器
-                ctx.timerService().registerProcessingTimeTimer(sendTime + 10 * 1000L);
+                ctx.timerService().registerProcessingTimeTimer(trigTime);
 
+                state.update(trigTime);
 
-                state.update(sendTime);
+                stateM.update(value);
 
             }
 
@@ -127,9 +136,17 @@ public class VehicleWithStatesHandleApp {
                 super.onTimer(timestamp, ctx, out);
                 //超过3分钟没有新数据过来 ，当前数据发送到下线的kafka topic
                 //todo  往下线kafka的topic发消息
+                Long state_val = state.value();
 
-                log.error("已超时==={}",state);
-                log.error("已超时==={}",out);
+                if(state_val == timestamp){
+                    log.error("=======");
+                    log.error(TimeUtils.getNowTime());
+                    log.error("=======");
+                    log.error("已超时==={}",state);
+                    log.error("已超时==={}",out);
+                    out.collect(stateM.value());
+                }
+
 
             }
         });

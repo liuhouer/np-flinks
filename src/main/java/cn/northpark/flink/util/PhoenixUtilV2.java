@@ -260,7 +260,9 @@ public class PhoenixUtilV2 {
 
 
     public static void main(String[] args) {
-        List<Map<String, String>> us_population = getList("\"stt\".URL_STT_20211217");
-        System.err.println(us_population);
+//        List<Map<String, String>> us_population = getList("\"stt\".URL_STT_20211217");
+//        System.err.println(us_population);
+        List<Map<String, String>> us_population2 = queryList("select * from \"stt\".URL_STT_20211217");
+        System.err.println(us_population2);
     }
 }

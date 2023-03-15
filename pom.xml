@@ -121,11 +121,18 @@ under the License.
 
 		<!--flink jdbc -->
 		<!-- 用于写入flinksql和mysql等建立连接-->
-<!--		<dependency>-->
-<!--			<groupId>org.apache.flink</groupId>-->
-<!--			<artifactId>flink-jdbc_2.11</artifactId>-->
-<!--			<version>1.10.0</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>org.apache.flink</groupId>
+			<artifactId>flink-jdbc_2.11</artifactId>
+			<version>1.10.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.flink/flink-csv -->
+		<dependency>
+			<groupId>org.apache.flink</groupId>
+			<artifactId>flink-csv</artifactId>
+			<version>1.10.1</version>
+		</dependency>
 
 
 		<!--flink-connector-rabbitmq_2.11-->
@@ -350,6 +357,12 @@ under the License.
 					<artifactId>httpclient</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.flink</groupId>
+			<artifactId>flink-csv</artifactId>
+			<version>1.12.1</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<!--		thrift  end-->

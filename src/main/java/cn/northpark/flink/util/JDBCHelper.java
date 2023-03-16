@@ -38,7 +38,10 @@ public class JDBCHelper {
 					pstmt.setObject(i + 1, params[i]);  
 				}
 			}
-			
+
+			// 拼接完整的 SQL 语句，并打印出来
+			genCompleteSQL(pstmt, params);
+
 			rtn = pstmt.executeUpdate();
 			
 			conn.commit();
@@ -48,7 +51,21 @@ public class JDBCHelper {
 		
 		return rtn;
 	}
-	
+
+	/**
+	 * 拼接完整的 SQL 语句，并打印出来
+	 * @param pstmt
+	 * @param params
+	 */
+	private static void genCompleteSQL(PreparedStatement pstmt, Object[] params) {
+		// 拼接完整的 SQL 语句，并打印出来
+		String completeSql = pstmt.toString().substring(pstmt.toString().indexOf(":") + 2);
+		for (Object param : params) {
+			completeSql = completeSql.replaceFirst("\\?", param.toString());
+		}
+		System.out.println("Complete SQL: " + completeSql);
+	}
+
 	/**
 	 * 执行查询SQL语句
 	 * @param sql
@@ -68,7 +85,9 @@ public class JDBCHelper {
 					pstmt.setObject(i + 1, params[i]);   
 				}
 			}
-			
+			// 拼接完整的 SQL 语句，并打印出来
+			genCompleteSQL(pstmt, params);
+
 			rs = pstmt.executeQuery();
 			
 			callback.process(rs);  
@@ -115,7 +134,7 @@ public class JDBCHelper {
 					pstmt.addBatch();
 				}
 			}
-			
+
 			// 第三步：使用PreparedStatement.executeBatch()方法，执行批量的SQL语句
 			rtn = pstmt.executeBatch();
 			

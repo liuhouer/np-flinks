@@ -170,7 +170,7 @@ public class SinkRedisMySQLApp1 {
                         " record_velocity, response_sn, route_alarm_type, route_segment_id, run_time_on_route, send_time, " +
                         " signal_state, sim_no, status, tired_alarm_time, update_date, valid, vehicle_id, velocity)" +
                         "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                JDBCHelper.executeUpdate(connection,upsert_sql, new JDBCHelper.QueryCallback() {
+                JDBCHelper.getInstance().executeUpdate(connection,upsert_sql, new JDBCHelper.QueryCallback() {
                             @Override
                             public void process(ResultSet rs) throws Exception {
 

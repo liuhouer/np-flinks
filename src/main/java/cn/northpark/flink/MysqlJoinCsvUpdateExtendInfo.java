@@ -74,7 +74,7 @@ public class MysqlJoinCsvUpdateExtendInfo {
                 String upSQL = "UPDATE t_attractions SET short_comment = ?, suitable_days = ?, avg_cost = ?, suitable_persons = ?, suitable_play = ? WHERE name LIKE '%"+value.f0+"%' and suitable_persons =''";
 
                 try {
-                    JDBCHelper.executeUpdate(connection,upSQL,value.f1,value.f2,value.f3,value.f4,value.f5);
+                    JDBCHelper.getInstance().executeUpdate(connection,upSQL,value.f1,value.f2,value.f3,value.f4,value.f5);
                 }catch (Exception ignore){
                     System.err.println(value);
                 }finally {

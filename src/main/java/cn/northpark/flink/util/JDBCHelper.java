@@ -9,10 +9,32 @@ import java.util.List;
 
 /**
  * JDBC辅助组件
+ * 可以保证在大数据组件中调用时保证线程安全
  * @author bruce
  *
  */
 public class JDBCHelper {
+	
+	private JDBCHelper() {
+	}
+
+	public static JDBCHelper getInstance() {
+		return JDBCHelper.Singleton.INSTANCE.getInstance();
+	}
+
+	private enum Singleton {
+		INSTANCE;
+
+		private JDBCHelper singleton;
+
+		Singleton() {
+			singleton = new JDBCHelper();
+		}
+
+		public JDBCHelper getInstance() {
+			return singleton;
+		}
+	}
 
 	/**
 	 * 第五步：开发增删改查的方法
@@ -24,7 +46,7 @@ public class JDBCHelper {
 	 * @param params
 	 * @return 影响的行数
 	 */
-	public static int executeUpdate(Connection conn,String sql, Object... params) {
+	public int executeUpdate(final Connection conn,String sql, Object... params) {
 		int rtn = 0;
 		PreparedStatement pstmt = null;
 		
@@ -57,7 +79,7 @@ public class JDBCHelper {
 	 * @param pstmt
 	 * @param params
 	 */
-	private static void genCompleteSQL(PreparedStatement pstmt, Object[] params) {
+	private void genCompleteSQL(PreparedStatement pstmt, Object[] params) {
 		// 拼接完整的 SQL 语句，并打印出来
 		String completeSql = pstmt.toString().substring(pstmt.toString().indexOf(":") + 2);
 		for (Object param : params) {
@@ -72,7 +94,7 @@ public class JDBCHelper {
 	 * @param params
 	 * @param callback
 	 */
-	public static void executeQuery(Connection conn,String sql,
+	public void executeQuery(final Connection conn,String sql,
 			QueryCallback callback , Object... params) {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -115,7 +137,7 @@ public class JDBCHelper {
 	 * @param paramsList
 	 * @return 每条SQL语句影响的行数
 	 */
-	public static int[] executeBatch(Connection conn,String sql, List<Object[]> paramsList) {
+	public int[] executeBatch(final Connection conn,String sql, List<Object[]> paramsList) {
 		int[] rtn = null;
 		PreparedStatement pstmt = null;
 		
@@ -152,7 +174,7 @@ public class JDBCHelper {
 	 * @author Administrator
 	 *
 	 */
-	public static interface QueryCallback {
+	public interface QueryCallback {
 		
 		/**
 		 * 处理查询结果

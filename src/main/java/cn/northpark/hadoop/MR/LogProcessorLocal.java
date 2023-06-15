@@ -65,6 +65,8 @@ public class LogProcessorLocal {
                     request = fields[5]+ " " +fields[6];
                 }
 
+                request = request.replace("\"","");
+
                 //解析时间线
                 String timeLine = fields[3]+ " " +fields[4];
                 timeLine = timeLine.replace("[","").replace("]","");
@@ -144,7 +146,7 @@ public class LogProcessorLocal {
         job.setOutputFormatClass(TextOutputFormat.class);
 
         FileInputFormat.addInputPath(job, new Path("C:\\Users\\Bruce\\Desktop\\xab.log"));
-        FileOutputFormat.setOutputPath(job, new Path("C:\\Users\\Bruce\\Desktop\\output"));
+        FileOutputFormat.setOutputPath(job, new Path("C:\\Users\\Bruce\\Desktop\\output2"));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 

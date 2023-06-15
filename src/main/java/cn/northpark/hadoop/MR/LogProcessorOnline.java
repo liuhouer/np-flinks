@@ -82,6 +82,8 @@ public class LogProcessorOnline {
                     request = fields[5]+ " " +fields[6];
                 }
 
+                request = request.replace("\"","");
+
                 //解析时间线
                 String timeLine = fields[3]+ " " +fields[4];
                 timeLine = timeLine.replace("[","").replace("]","");

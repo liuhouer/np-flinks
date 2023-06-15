@@ -36,8 +36,9 @@ public class HdfsOp {
         //下载文件
         //get(fileSystem);
         //删除文件
-        delete(fileSystem);
+//        delete(fileSystem);
 
+        putCovid(fileSystem);
     }
 
     /**
@@ -85,4 +86,35 @@ public class HdfsOp {
         IOUtils.copyBytes(fis,fos,1024,true);
     }
 
+
+    /**
+     * 上传文件
+     * @param fileSystem
+     * @throws IOException
+     */
+    private static void putCovid(FileSystem fileSystem) throws IOException {
+        //获取本地文件的输入流
+        FileInputStream fis = new FileInputStream("C:\\Users\\Bruce\\Desktop\\COVID-19.dat");
+        //获取HDFS文件系统的输出流
+        FSDataOutputStream fos = fileSystem.create(new Path("/CovidStatistics/COVID-19.dat"));
+        //上传文件：通过工具类把输入流拷贝到输出流里面，实现本地文件上传到HDFS
+        IOUtils.copyBytes(fis,fos,1024,true);
+    }
+
+    /**
+     * 删除文件或者目录
+     * @param fileSystem
+     * @throws IOException
+     */
+    private static void deleteCovid(FileSystem fileSystem) throws IOException {
+        //删除文件，目录也可以删除
+        //如果要递归删除目录，则第二个参数需要设置为true
+        //如果删除的是文件或者空目录，第二个参数会被忽略
+        boolean flag = fileSystem.delete(new Path("/CovidStatistics"),true);
+        if(flag){
+            System.out.println("删除成功!");
+        }else{
+            System.out.println("删除失败!");
+        }
+    }
 }

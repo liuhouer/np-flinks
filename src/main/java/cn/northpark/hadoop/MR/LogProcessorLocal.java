@@ -41,7 +41,7 @@ import java.util.Locale;
  * 1995-06-01 17:07:21,sabre47.sasknet.sk.ca,GET,/lycos/spider-icon.gif,HTTP/1.0,200,881
  * 1995-06-01 17:07:15,sabre47.sasknet.sk.ca,GET,/cgi-bin/pursuit-beta,HTTP/1.0,200,1240
  */
-public class LogProcessor {
+public class LogProcessorLocal {
     public static class LogMapper extends Mapper<LongWritable, Text, Text, Text> {
 
         private Text outKey = new Text();
@@ -128,7 +128,7 @@ public class LogProcessor {
         // 设置输出分隔符为逗号
         job.getConfiguration().set("mapreduce.output.textoutputformat.separator", ",");
 
-        job.setJarByClass(LogProcessor.class);
+        job.setJarByClass(LogProcessorLocal.class);
         job.setMapperClass(LogMapper.class);
         job.setReducerClass(LogReducer.class);
 
@@ -143,8 +143,8 @@ public class LogProcessor {
         job.setInputFormatClass(TextInputFormat.class);
         job.setOutputFormatClass(TextOutputFormat.class);
 
-        FileInputFormat.addInputPath(job, new Path("C:\\Users\\Bruce\\Desktop\\xaa.log"));
-        FileOutputFormat.setOutputPath(job, new Path("C:\\Users\\Bruce\\Desktop\\output2"));
+        FileInputFormat.addInputPath(job, new Path("C:\\Users\\Bruce\\Desktop\\xab.log"));
+        FileOutputFormat.setOutputPath(job, new Path("C:\\Users\\Bruce\\Desktop\\output"));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 

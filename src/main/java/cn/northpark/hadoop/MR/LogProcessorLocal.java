@@ -145,7 +145,7 @@ public class LogProcessorLocal {
         job.setInputFormatClass(TextInputFormat.class);
         job.setOutputFormatClass(TextOutputFormat.class);
 
-        FileInputFormat.addInputPath(job, new Path("C:\\Users\\Bruce\\Desktop\\xab.log"));
+        FileInputFormat.addInputPath(job, new Path("C:\\Users\\Bruce\\Desktop\\xaa.log"));
         FileOutputFormat.setOutputPath(job, new Path("C:\\Users\\Bruce\\Desktop\\output2"));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }

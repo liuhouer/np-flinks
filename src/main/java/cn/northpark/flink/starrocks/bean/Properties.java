@@ -1,5 +1,5 @@
 
-package cn.northpark.flink.money.bean;
+package cn.northpark.flink.starrocks.bean;
 
 import com.alibaba.fastjson.annotation.JSONField;
 

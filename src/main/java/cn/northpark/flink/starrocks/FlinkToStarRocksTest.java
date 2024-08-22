@@ -1,4 +1,4 @@
-package cn.northpark.flink.money;
+package cn.northpark.flink.starrocks;
 
 import com.google.gson.Gson;
 import com.starrocks.connector.flink.StarRocksSink;

@@ -266,6 +266,16 @@ under the License.
 		</dependency>
 
 
+
+		<!--starrocks connector-->
+		<!-- https://mvnrepository.com/artifact/com.starrocks/flink-connector-starrocks -->
+		<dependency>
+			<groupId>com.starrocks</groupId>
+			<artifactId>flink-connector-starrocks</artifactId>
+			<version>1.2.6_flink-1.12_2.12</version>
+		</dependency>
+
+
 		<!--spark -->
 
 		<dependency>
